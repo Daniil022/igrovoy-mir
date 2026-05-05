@@ -1,509 +1,243 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1a1a2e;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: #1a1a0a;
     color: #fff;
-    overflow-x: hidden;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* Загрузочный экран */
+/* Загрузка */
 .loading-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #16213e, #0f3460);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    transition: opacity 0.5s;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(180deg, #2d1a00, #1a0f00);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; transition: opacity 0.5s;
 }
-
-.loading-screen.hidden {
-    opacity: 0;
-    pointer-events: none;
+.loading-screen.hidden { opacity: 0; pointer-events: none; }
+.loading-content { text-align: center; }
+.loading-content h1 {
+    font-size: 2.5rem; color: #f39c12; margin-bottom: 1.5rem;
+    text-shadow: 0 0 20px #f39c12;
 }
-
-.loading-content {
-    text-align: center;
-}
-
-.game-title {
-    font-size: 3rem;
-    background: linear-gradient(45deg, #e94560, #533483, #0f3460);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 2rem;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
 .loading-bar {
-    width: 300px;
-    height: 12px;
-    background: #333;
-    border-radius: 10px;
-    margin: 0 auto 1rem auto;
-    overflow: hidden;
+    width: 280px; height: 10px; background: #333;
+    border-radius: 10px; margin: 0 auto 1rem auto; overflow: hidden;
 }
-
 .loading-progress {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #e94560, #f39c12);
-    border-radius: 10px;
-    animation: loadAnim 2s forwards;
+    height: 100%; background: linear-gradient(90deg, #f39c12, #e74c3c);
+    border-radius: 10px; animation: loadBar 2s forwards;
 }
-
-@keyframes loadAnim {
-    from { width: 0%; }
-    to { width: 100%; }
-}
+@keyframes loadBar { from { width: 0%; } to { width: 100%; } }
 
 /* Контейнер игры */
-.game-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-.game-container.hidden {
-    display: none;
-}
+.game-container { display: flex; flex-direction: column; min-height: 100vh; }
+.game-container.hidden { display: none; }
 
 /* Верхняя панель */
 .top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.8rem 1.5rem;
-    background: #16213e;
-    border-bottom: 2px solid #0f3460;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.6rem 1rem; background: #1a0f00; border-bottom: 2px solid #3d2000;
+    flex-wrap: wrap; gap: 0.5rem; position: sticky; top: 0; z-index: 100;
 }
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
+.resources { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+.res-item {
+    font-size: 0.9rem; font-weight: bold;
+    padding: 0.3rem 0.6rem; border-radius: 12px; background: #2a1800;
 }
-
-.avatar {
-    font-size: 2rem;
-    cursor: pointer;
-    transition: transform 0.3s;
-}
-
-.avatar:hover {
-    transform: scale(1.2);
-}
-
-.currency-panel {
-    display: flex;
-    gap: 1.5rem;
-}
-
-.currency {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-weight: bold;
-}
-
-.coin-icon, .gem-icon {
-    font-size: 1.3rem;
-}
-
-.level-display {
-    background: rgba(233,69,96,0.2);
-    padding: 0.4rem 1rem;
-    border-radius: 20px;
-    color: #e94560;
-    font-weight: bold;
-}
+.res-item.coins { background: #3d2b00; color: #f1c40f; }
+.res-item.oil { background: #1a1a1a; color: #888; }
+.level-info { color: #f39c12; font-weight: bold; font-size: 0.95rem; }
 
 /* Основная область */
-.main-area {
-    flex: 1;
-    padding: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-}
+.main-area { flex: 1; padding: 1rem; max-width: 700px; margin: 0 auto; width: 100%; }
+.view { display: none; }
+.view.active { display: block; }
 
-/* Виды */
-.map-view, .location-view, .minigame-view {
-    display: none;
+/* Шахта */
+.mine-scene { text-align: center; }
+.mine-cartoon {
+    position: relative; height: 120px; margin-bottom: 0.5rem;
 }
-
-.map-view.active, .location-view.active, .minigame-view.active {
-    display: block;
+.miner-icon {
+    font-size: 4rem; position: absolute; left: 50%; bottom: 10px;
+    transform: translateX(-50%); animation: minerBounce 0.6s infinite alternate;
+    cursor: pointer; user-select: none;
 }
-
-/* Карта */
-.world-map {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.2rem;
-    margin-top: 1.5rem;
+.miner-icon:active { animation: minerHit 0.1s; }
+@keyframes minerBounce {
+    from { bottom: 10px; }
+    to { bottom: 25px; }
 }
-
-.location-card {
-    background: #16213e;
-    border: 2px solid #0f3460;
-    border-radius: 15px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: transform 0.3s, border-color 0.3s;
-    cursor: pointer;
+@keyframes minerHit {
+    0% { transform: translateX(-50%) rotate(0); }
+    50% { transform: translateX(-50%) rotate(-30deg); }
+    100% { transform: translateX(-50%) rotate(0); }
 }
-
-.location-card:hover {
-    transform: translateY(-5px);
-    border-color: #e94560;
+.oil-pump {
+    font-size: 2.5rem; position: absolute; right: 20%; bottom: 10px;
+    animation: pumpMove 2s infinite;
 }
-
-.location-card.forest:hover { border-color: #27ae60; }
-.location-card.pier:hover { border-color: #3498db; }
-.location-card.mountains:hover { border-color: #95a5a6; }
-.location-card.beach:hover { border-color: #f39c12; }
-.location-card.square:hover { border-color: #e94560; }
-.location-card.residential:hover { border-color: #9b59b6; }
-.location-card.park:hover { border-color: #2ecc71; }
-.location-card.mall:hover { border-color: #e74c3c; }
-
-.location-icon {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
+@keyframes pumpMove {
+    0%, 100% { bottom: 10px; }
+    50% { bottom: 20px; }
 }
-
-.location-card h3 {
-    margin-bottom: 0.3rem;
+.ore-pop {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    font-size: 1.5rem; opacity: 0; transition: all 0.3s;
 }
+.ore-pop.show { opacity: 1; top: -20px; }
 
-.location-card p {
-    color: #888;
-    font-size: 0.85rem;
-    margin-bottom: 0.8rem;
+/* Кнопка копать */
+.mine-btn {
+    background: linear-gradient(180deg, #8B4513, #5C2E00);
+    color: #f39c12; border: 3px solid #f39c12; padding: 1.2rem 3rem;
+    font-size: 1.5rem; font-weight: bold; border-radius: 20px;
+    cursor: pointer; margin: 0.5rem 0; transition: all 0.1s;
+    text-shadow: 0 0 10px #f39c12; box-shadow: 0 0 20px rgba(243,156,18,0.3);
 }
+.mine-btn:active { transform: scale(0.95); background: #3d1a00; }
 
-.players-count {
-    display: block;
-    font-size: 0.8rem;
-    color: #aaa;
-    margin-bottom: 0.8rem;
+/* Прогресс */
+.progress-bar {
+    width: 80%; height: 20px; background: #2a1800; border-radius: 10px;
+    margin: 0.8rem auto; overflow: hidden; border: 2px solid #3d2000;
 }
+.progress-fill {
+    height: 100%; background: linear-gradient(90deg, #f39c12, #e74c3c);
+    border-radius: 10px; transition: width 0.1s; width: 0%;
+}
+#current-ore-text { color: #ccc; font-size: 0.9rem; }
 
-.enter-btn {
-    background: #e94560;
-    color: #fff;
-    border: none;
-    padding: 0.6rem 1.5rem;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background 0.3s;
+/* Статистика */
+.stats-row {
+    display: flex; justify-content: center; gap: 1.5rem;
+    flex-wrap: wrap; margin: 0.8rem 0; font-size: 0.9rem;
 }
+.stats-row b { color: #f39c12; }
 
-.enter-btn:hover {
-    background: #c0392b;
+/* Нефтянка */
+.oil-section {
+    background: #1a1a1a; border: 2px solid #333; border-radius: 15px;
+    padding: 1rem; margin: 1rem 0;
 }
+.oil-section h3 { color: #888; margin-bottom: 0.5rem; }
 
-/* Локация */
-.back-btn {
-    background: #333;
-    color: #fff;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 15px;
-    cursor: pointer;
-    margin-bottom: 1rem;
+.oil-btn {
+    background: #222; color: #888; border: 2px solid #444;
+    padding: 0.7rem 1.5rem; border-radius: 20px; cursor: pointer;
+    margin-top: 0.5rem; font-size: 0.95rem; transition: all 0.3s;
 }
+.oil-btn:hover { border-color: #888; color: #fff; }
 
-.location-scene {
-    display: flex;
-    gap: 1.5rem;
-    margin: 1.5rem 0;
+/* Кнопка продажи */
+.sell-btn {
+    background: linear-gradient(180deg, #f1c40f, #d4a017);
+    color: #1a0f00; border: none; padding: 1rem 2rem;
+    font-size: 1.2rem; font-weight: bold; border-radius: 25px;
+    cursor: pointer; margin-top: 0.8rem; width: 90%; max-width: 400px;
+    transition: transform 0.1s;
 }
+.sell-btn:active { transform: scale(0.95); }
 
-.scene-area {
-    flex: 2;
-    min-height: 300px;
-    background: #16213e;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    color: #888;
+/* Магазин */
+.shop-tabs { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.stab {
+    background: #2a1800; color: #888; border: 1px solid #3d2000;
+    padding: 0.5rem 0.8rem; border-radius: 15px; cursor: pointer;
+    font-size: 0.8rem; transition: all 0.3s;
 }
+.stab.active, .stab:hover { background: #3d2000; color: #f39c12; border-color: #f39c12; }
+.shop-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.8rem;
+}
+.shop-card {
+    background: #2a1800; border: 2px solid #3d2000; border-radius: 12px;
+    padding: 1rem; text-align: center; transition: border-color 0.3s;
+}
+.shop-card:hover { border-color: #f39c12; }
+.shop-card .card-icon { font-size: 2.5rem; margin-bottom: 0.3rem; }
+.shop-card h4 { font-size: 0.9rem; margin-bottom: 0.3rem; }
+.shop-card .card-desc { font-size: 0.75rem; color: #888; margin-bottom: 0.5rem; }
+.shop-card .card-price { font-weight: bold; color: #f1c40f; margin-bottom: 0.5rem; }
+.shop-card button {
+    background: #f39c12; color: #1a0f00; border: none; padding: 0.5rem 1rem;
+    border-radius: 15px; cursor: pointer; font-weight: bold; width: 100%;
+}
+.shop-card button:disabled { background: #555; color: #999; cursor: not-allowed; }
 
-.players-here {
-    flex: 1;
-    background: #16213e;
-    border-radius: 15px;
-    padding: 1rem;
+/* Инвентарь */
+.inv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.8rem; }
+.inv-item {
+    background: #2a1800; border: 1px solid #3d2000; border-radius: 10px;
+    padding: 0.8rem; text-align: center;
 }
+.inv-item .inv-icon { font-size: 2rem; }
 
-.players-here h4 {
-    margin-bottom: 0.8rem;
-    color: #e94560;
+/* Достижения */
+#achievements-content { display: grid; gap: 0.8rem; }
+.achieve-card {
+    background: #2a1800; border: 2px solid #3d2000; border-radius: 12px;
+    padding: 1rem; display: flex; align-items: center; gap: 1rem;
 }
-
-.players-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.player-dot {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: #0f3460;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-}
-
-.location-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.action-btn {
-    flex: 1;
-    padding: 0.8rem;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.3s;
-}
-
-.mini-game-btn {
-    background: #f39c12;
-    color: #fff;
-}
-
-.mini-game-btn:hover {
-    background: #e67e22;
-}
-
-.collect-btn {
-    background: #27ae60;
-    color: #fff;
-}
-
-.collect-btn:hover {
-    background: #229954;
-}
-
-/* Мини-игра */
-.minigame-view h2 {
-    margin-bottom: 1rem;
-}
-
-#minigame-content {
-    background: #16213e;
-    border-radius: 15px;
-    padding: 2rem;
-    min-height: 300px;
-    text-align: center;
-}
-
-#minigame-score {
-    margin-top: 1rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #f39c12;
-}
+.achieve-card.done { border-color: #f39c12; }
+.achieve-card.locked { opacity: 0.5; }
+.achieve-card .ach-icon { font-size: 2rem; }
 
 /* Нижняя панель */
 .bottom-bar {
-    display: flex;
-    justify-content: space-around;
-    padding: 0.8rem;
-    background: #16213e;
-    border-top: 2px solid #0f3460;
-    position: sticky;
-    bottom: 0;
+    display: flex; justify-content: space-around; padding: 0.6rem;
+    background: #1a0f00; border-top: 2px solid #3d2000;
+    position: sticky; bottom: 0;
 }
-
 .nav-btn {
-    background: transparent;
-    color: #888;
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: all 0.3s;
+    background: transparent; color: #888; border: none;
+    padding: 0.5rem 0.8rem; border-radius: 10px; cursor: pointer;
+    font-size: 0.85rem; transition: all 0.3s;
 }
+.nav-btn:hover, .nav-btn.active { background: #2a1800; color: #f39c12; }
 
-.nav-btn:hover, .nav-btn.active {
-    background: #0f3460;
-    color: #fff;
-}
-
-/* Модальные окна */
+/* Модалки */
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); display: flex; align-items: center;
+    justify-content: center; z-index: 1000;
 }
-
-.modal.hidden {
-    display: none;
-}
-
+.modal.hidden { display: none; }
 .modal-content {
-    background: #1a1a2e;
-    padding: 2rem;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
+    background: #2a1800; padding: 2rem; border-radius: 20px;
+    text-align: center; border: 2px solid #f39c12; max-width: 400px; width: 90%;
+}
+.case-open h2 { color: #f39c12; margin-bottom: 1rem; }
+#case-result { font-size: 1.5rem; margin: 1rem 0; min-height: 60px; }
+.action-btn {
+    background: #f39c12; color: #1a0f00; border: none; padding: 0.8rem 2rem;
+    border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 1rem;
 }
 
-.close-modal {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #888;
+/* Попап ачивки */
+.achieve-popup {
+    position: fixed; top: 80px; right: 20px; z-index: 999;
+    animation: slideIn 0.5s ease;
+}
+.achieve-popup.hidden { display: none; }
+.achieve-popup-content {
+    background: #2a1800; border: 2px solid #f39c12; border-radius: 15px;
+    padding: 1rem; display: flex; align-items: center; gap: 0.8rem;
+    box-shadow: 0 0 20px rgba(243,156,18,0.5);
+}
+.achieve-icon { font-size: 2rem; }
+.achieve-popup-content strong { color: #f39c12; }
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
-.shop-grid, .inventory-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
+@media (max-width: 480px) {
+    .mine-btn { padding: 1rem 2rem; font-size: 1.2rem; }
+    .resources { gap: 0.3rem; }
+    .res-item { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
+    .stats-row { gap: 0.8rem; font-size: 0.8rem; }
 }
-
-.shop-item {
-    background: #16213e;
-    padding: 1rem;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.shop-item .item-icon {
-    font-size: 2.5rem;
-}
-
-.shop-item button {
-    background: #e94560;
-    color: #fff;
-    border: none;
-    padding: 0.4rem 1rem;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    width: 100%;
-}
-
-/* Чат */
-.chat-messages {
-    min-height: 300px;
-    max-height: 400px;
-    overflow-y: auto;
-    background: #0f0f1a;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-}
-
-.chat-msg {
-    margin-bottom: 0.5rem;
-    padding: 0.5rem;
-    background: #16213e;
-    border-radius: 8px;
-}
-
-.chat-input-area {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.chat-input-area input {
-    flex: 1;
-    padding: 0.7rem;
-    background: #0f0f1a;
-    border: 1px solid #333;
-    border-radius: 8px;
-    color: #fff;
-}
-
-.chat-input-area button {
-    background: #e94560;
-    color: #fff;
-    border: none;
-    padding: 0.7rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-/* Друзья */
-.friend-card {
-    background: #16213e;
-    padding: 0.8rem 1rem;
-    border-radius: 10px;
-    margin-bottom: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-}
-
-.online { color: #27ae60; }
-.offline { color: #888; }
-
-.add-friend-btn {
-    background: #0f3460;
-    color: #fff;
-    border: none;
-    padding: 0.7rem 1.5rem;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-top: 1rem;
-    width: 100%;
-}
-
-/* Адаптив */
-@media (max-width: 768px) {
-    .world-map {
-        grid-template-columns: 1fr;
-    }
-    .location-scene {
-        flex-direction: column;
-    }
-    .top-bar {
-        font-size: 0.8rem;
-        padding: 0.5rem;
-    }
-  }
