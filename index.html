@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игровой-Мир — Виртуальный мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Загрузочный экран -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <h1 class="game-title">🎮 Игровой-Мир</h1>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <p>Загрузка...</p>
+        </div>
+    </div>
+
+    <!-- Основной интерфейс -->
+    <div id="game-container" class="game-container hidden">
+
+        <!-- Верхняя панель -->
+        <header class="top-bar">
+            <div class="user-info">
+                <div class="avatar" id="user-avatar">😊</div>
+                <span id="username-display">Игрок</span>
+            </div>
+            <div class="currency-panel">
+                <div class="currency">
+                    <span class="coin-icon">🪙</span>
+                    <span id="coins-count">500</span>
+                </div>
+                <div class="currency">
+                    <span class="gem-icon">💎</span>
+                    <span id="gems-count">50</span>
+                </div>
+            </div>
+            <div class="level-display">
+                <span>⭐ Уровень: </span>
+                <span id="level-count">1</span>
+            </div>
+        </header>
+
+        <!-- Основная область -->
+        <main class="main-area">
+
+            <!-- Карта мира -->
+            <section id="map-view" class="map-view active">
+                <h2>🗺 Карта Игрового-Мира</h2>
+                <div class="world-map">
+                    
+                    <div class="location-card forest" data-location="forest">
+                        <div class="location-icon">🌲</div>
+                        <h3>Дремучий лес</h3>
+                        <p>Таинственный лес с загадками</p>
+                        <span class="players-count">👥 12 игроков</span>
+                        <button class="enter-btn">Войти</button>
+                    </div>
+
+                    <div class="location-card pier" data-location="pier">
+                        <div class="location-icon">⚓</div>
+                        <h3>Пирс</h3>
+                        <p>Рыбалка и морские приключения</p>
+                        <span class="players-count">👥 8 игроков</span>
+                        <button class="enter-btn">Войти</button>
+                    </div>
+
+                    <div class="location-card mountains" data-location="mountains">
+                        <div class="location-icon">🏔</div>
+                        <h3>Горы</h3>
+                        <p>Скалолазание и поиск сокровищ</p>
+                        <span class="players-count">👥 5 игроков</span>
+                        <button class="enter-btn">Войти</button>
+                    </div>
+
+                    <div class="location-card beach" data-location="beach">
+                        <div class="location-icon">🏖</div>
+                        <h3>Пляж</h3>
+                        <p>Солнце, песок и волейбол</p>
+                        <span class="players-count">👥 15 игроков</span>
+                        <button class="enter-btn">Войти</button>
+                    </div>
+
+                    <div class="location-card square" data-location="square">
+                        <div class="location-icon">🏛</div>
+                        <h3>Площадь</h3>
+                        <p>Центр города, встречи и события</p>
+                        <span class="players-count">👥 20 игроков</span>
+                        <button class="enter-btn">Войти</button>
+                    </div>
+
+                    <div class="location-card residential" data-location="residential">
+                        <div class="location-icon">🏘</div>
+                        <h3>Жилой район</h3>
+                        <p>Мой дом, соседи и гаражи</p>
+                        <span class="players-count">👥 10 игроков</span>
+                        <button class="enter-btn">Войти</button>
+                    </div>
+
+                    <div class="location-card park" data-location="park">
+                        <div class="location-icon">🌳</div>
+                        <h3>Парк</h3>
+                        <p>Аттракционы и пикники</p>
+                        <span class="players-count">👥 18 игроков</span>
+                        <button class="enter-btn">Войти</button>
+                    </div>
+
+                    <div class="location-card mall" data-location="mall">
+                        <div class="location-icon">🏬</div>
+                        <h3>Торговый центр</h3>
+                        <p>Магазины, кино и кафе</p>
+                        <span class="players-count">👥 25 игроков</span>
+                        <button class="enter-btn">Войти</button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Локация (вид внутри) -->
+            <section id="location-view" class="location-view hidden">
+                <button class="back-btn" id="back-to-map">⬅ На карту</button>
+                <div id="location-content">
+                    <h2 id="location-title">Локация</h2>
+                    <div class="location-scene">
+                        <div class="scene-area" id="scene-area">
+                            <p>Вы находитесь в локации</p>
+                        </div>
+                        <div class="players-here" id="players-here">
+                            <h4>Игроки здесь:</h4>
+                            <div class="players-list" id="players-list"></div>
+                        </div>
+                    </div>
+                    <div class="location-actions">
+                        <button class="action-btn mini-game-btn" id="mini-game-btn">🎮 Мини-игра</button>
+                        <button class="action-btn collect-btn" id="collect-btn">🎁 Собрать бонус</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Мини-игра -->
+            <section id="minigame-view" class="minigame-view hidden">
+                <button class="back-btn" id="back-to-location">⬅ Назад</button>
+                <h2 id="minigame-title">Мини-игра</h2>
+                <div id="minigame-content"></div>
+                <div id="minigame-score">Очки: 0</div>
+            </section>
+
+        </main>
+
+        <!-- Нижняя панель с действиями -->
+        <footer class="bottom-bar">
+            <button class="nav-btn active" data-view="map">🗺 Карта</button>
+            <button class="nav-btn" data-view="inventory">🎒 Инвентарь</button>
+            <button class="nav-btn" data-view="friends">👫 Друзья</button>
+            <button class="nav-btn" data-view="chat">💬 Чат</button>
+            <button class="nav-btn" data-view="shop">🛒 Магазин</button>
+        </footer>
+
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="shop-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>🛒 Магазин</h2>
+            <div class="shop-grid" id="shop-items">
+                <!-- Товары добавляются через JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="inventory-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>🎒 Инвентарь</h2>
+            <div class="inventory-grid" id="inventory-items">
+                <p>Пока пусто. Купи что-нибудь в магазине!</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>💬 Чат</h2>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Напиши сообщение...">
+                <button id="send-chat">Отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="friends-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>👫 Друзья</h2>
+            <div id="friends-list">
+                <div class="friend-card">🧑 Сапфир — <span class="online">В сети</span></div>
+                <div class="friend-card">👩 Элина — <span class="online">В сети</span></div>
+                <div class="friend-card">👧 Алина — <span class="offline">Не в сети</span></div>
+                <div class="friend-card">👦 Максим — <span class="online">В сети</span></div>
+                <div class="friend-card">👩‍🦰 Катя — <span class="offline">Не в сети</span></div>
+            </div>
+            <button class="add-friend-btn">+ Добавить друга</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+  </html>
