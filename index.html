@@ -3,212 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игровой-Мир — Виртуальный мир</title>
+    <title>⛏ Шахтёр-Мир — Копай и богатей!</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Загрузочный экран -->
+    <!-- Загрузка -->
     <div id="loading-screen" class="loading-screen">
         <div class="loading-content">
-            <h1 class="game-title">🎮 Игровой-Мир</h1>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
-            <p>Загрузка...</p>
+            <h1>⛏ Шахтёр-Мир</h1>
+            <div class="loading-bar"><div class="loading-progress"></div></div>
+            <p>Спускаемся в шахту...</p>
         </div>
     </div>
 
-    <!-- Основной интерфейс -->
+    <!-- Игра -->
     <div id="game-container" class="game-container hidden">
 
-        <!-- Верхняя панель -->
+        <!-- Верхняя панель ресурсов -->
         <header class="top-bar">
-            <div class="user-info">
-                <div class="avatar" id="user-avatar">😊</div>
-                <span id="username-display">Игрок</span>
+            <div class="resources">
+                <span class="res-item stone">🪨<span id="stone">0</span></span>
+                <span class="res-item iron">🔩<span id="iron">0</span></span>
+                <span class="res-item gold">🥇<span id="gold">0</span></span>
+                <span class="res-item diamond">💎<span id="diamond">0</span></span>
+                <span class="res-item oil">🛢<span id="oil">0</span></span>
+                <span class="res-item coins">🪙<span id="coins">100</span></span>
             </div>
-            <div class="currency-panel">
-                <div class="currency">
-                    <span class="coin-icon">🪙</span>
-                    <span id="coins-count">500</span>
-                </div>
-                <div class="currency">
-                    <span class="gem-icon">💎</span>
-                    <span id="gems-count">50</span>
-                </div>
-            </div>
-            <div class="level-display">
-                <span>⭐ Уровень: </span>
-                <span id="level-count">1</span>
+            <div class="level-info">
+                ⭐ Уровень: <span id="level">1</span>
             </div>
         </header>
 
-        <!-- Основная область -->
         <main class="main-area">
-
-            <!-- Карта мира -->
-            <section id="map-view" class="map-view active">
-                <h2>🗺 Карта Игрового-Мира</h2>
-                <div class="world-map">
+            
+            <!-- Шахта -->
+            <section id="mine-view" class="view active">
+                <div class="mine-scene">
                     
-                    <div class="location-card forest" data-location="forest">
-                        <div class="location-icon">🌲</div>
-                        <h3>Дремучий лес</h3>
-                        <p>Таинственный лес с загадками</p>
-                        <span class="players-count">👥 12 игроков</span>
-                        <button class="enter-btn">Войти</button>
+                    <!-- Анимация -->
+                    <div class="mine-cartoon">
+                        <div class="miner-icon" id="miner-icon">⛏️</div>
+                        <div class="oil-pump" id="oil-pump">🛢️</div>
+                        <div class="ore-pop" id="ore-pop"></div>
+                    </div>
+                    
+                    <!-- Кнопка копать -->
+                    <button id="mine-btn" class="mine-btn">⛏️ КОПАТЬ!</button>
+                    
+                    <!-- Прогресс -->
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="ore-progress"></div>
+                    </div>
+                    <p id="current-ore-text">🪨 Камень</p>
+                    
+                    <!-- Статы -->
+                    <div class="stats-row">
+                        <div>👷 Шахтёры: <b id="miners-count">1</b></div>
+                        <div>⚡ Сила: <b id="click-power">1</b></div>
+                        <div>⛏ Авто-руда: <b id="auto-power">0</b>/сек</div>
+                    </div>
+                    
+                    <!-- Нефтянка -->
+                    <div class="oil-section">
+                        <h3>🛢 Нефтяная вышка</h3>
+                        <div class="stats-row">
+                            <div>🏭 Вышек: <b id="oil-rigs-count">0</b></div>
+                            <div>🛢 Бочек: <b id="barrels-count">0</b></div>
+                            <div>⏱ Добыча: <b id="oil-auto">0</b>/сек</div>
+                        </div>
+                        <button id="collect-oil-btn" class="oil-btn">🛢 Собрать нефть (<span id="oil-ready">0</span>)</button>
                     </div>
 
-                    <div class="location-card pier" data-location="pier">
-                        <div class="location-icon">⚓</div>
-                        <h3>Пирс</h3>
-                        <p>Рыбалка и морские приключения</p>
-                        <span class="players-count">👥 8 игроков</span>
-                        <button class="enter-btn">Войти</button>
-                    </div>
-
-                    <div class="location-card mountains" data-location="mountains">
-                        <div class="location-icon">🏔</div>
-                        <h3>Горы</h3>
-                        <p>Скалолазание и поиск сокровищ</p>
-                        <span class="players-count">👥 5 игроков</span>
-                        <button class="enter-btn">Войти</button>
-                    </div>
-
-                    <div class="location-card beach" data-location="beach">
-                        <div class="location-icon">🏖</div>
-                        <h3>Пляж</h3>
-                        <p>Солнце, песок и волейбол</p>
-                        <span class="players-count">👥 15 игроков</span>
-                        <button class="enter-btn">Войти</button>
-                    </div>
-
-                    <div class="location-card square" data-location="square">
-                        <div class="location-icon">🏛</div>
-                        <h3>Площадь</h3>
-                        <p>Центр города, встречи и события</p>
-                        <span class="players-count">👥 20 игроков</span>
-                        <button class="enter-btn">Войти</button>
-                    </div>
-
-                    <div class="location-card residential" data-location="residential">
-                        <div class="location-icon">🏘</div>
-                        <h3>Жилой район</h3>
-                        <p>Мой дом, соседи и гаражи</p>
-                        <span class="players-count">👥 10 игроков</span>
-                        <button class="enter-btn">Войти</button>
-                    </div>
-
-                    <div class="location-card park" data-location="park">
-                        <div class="location-icon">🌳</div>
-                        <h3>Парк</h3>
-                        <p>Аттракционы и пикники</p>
-                        <span class="players-count">👥 18 игроков</span>
-                        <button class="enter-btn">Войти</button>
-                    </div>
-
-                    <div class="location-card mall" data-location="mall">
-                        <div class="location-icon">🏬</div>
-                        <h3>Торговый центр</h3>
-                        <p>Магазины, кино и кафе</p>
-                        <span class="players-count">👥 25 игроков</span>
-                        <button class="enter-btn">Войти</button>
-                    </div>
-
+                    <!-- Кнопка продажи -->
+                    <button id="sell-all-btn" class="sell-btn">💰 ПРОДАТЬ ВСЁ</button>
                 </div>
             </section>
 
-            <!-- Локация (вид внутри) -->
-            <section id="location-view" class="location-view hidden">
-                <button class="back-btn" id="back-to-map">⬅ На карту</button>
-                <div id="location-content">
-                    <h2 id="location-title">Локация</h2>
-                    <div class="location-scene">
-                        <div class="scene-area" id="scene-area">
-                            <p>Вы находитесь в локации</p>
-                        </div>
-                        <div class="players-here" id="players-here">
-                            <h4>Игроки здесь:</h4>
-                            <div class="players-list" id="players-list"></div>
-                        </div>
-                    </div>
-                    <div class="location-actions">
-                        <button class="action-btn mini-game-btn" id="mini-game-btn">🎮 Мини-игра</button>
-                        <button class="action-btn collect-btn" id="collect-btn">🎁 Собрать бонус</button>
-                    </div>
+            <!-- Магазин -->
+            <section id="shop-view" class="view hidden">
+                <h2>🛒 Магазин</h2>
+                <div class="shop-tabs">
+                    <button class="stab active" data-tab="miners">👷 Шахтёры</button>
+                    <button class="stab" data-tab="pickaxes">🧰 Кирки</button>
+                    <button class="stab" data-tab="oilrigs">🏭 Вышки</button>
+                    <button class="stab" data-tab="barrels">🛢 Бочки</button>
+                    <button class="stab" data-tab="cases">📦 Кейсы</button>
+                    <button class="stab" data-tab="boosts">🔥 Бусты</button>
+                </div>
+                <div id="shop-content" class="shop-grid"></div>
+            </section>
+
+            <!-- Инвентарь -->
+            <section id="inventory-view" class="view hidden">
+                <h2>🎒 Инвентарь</h2>
+                <div id="inventory-content" class="inv-grid">
+                    <p style="color:#888;">Пока пусто</p>
                 </div>
             </section>
 
-            <!-- Мини-игра -->
-            <section id="minigame-view" class="minigame-view hidden">
-                <button class="back-btn" id="back-to-location">⬅ Назад</button>
-                <h2 id="minigame-title">Мини-игра</h2>
-                <div id="minigame-content"></div>
-                <div id="minigame-score">Очки: 0</div>
+            <!-- Достижения -->
+            <section id="achievements-view" class="view hidden">
+                <h2>🏆 Достижения</h2>
+                <div id="achievements-content"></div>
             </section>
 
         </main>
 
-        <!-- Нижняя панель с действиями -->
+        <!-- Нижнее меню -->
         <footer class="bottom-bar">
-            <button class="nav-btn active" data-view="map">🗺 Карта</button>
-            <button class="nav-btn" data-view="inventory">🎒 Инвентарь</button>
-            <button class="nav-btn" data-view="friends">👫 Друзья</button>
-            <button class="nav-btn" data-view="chat">💬 Чат</button>
+            <button class="nav-btn active" data-view="mine">⛏ Шахта</button>
             <button class="nav-btn" data-view="shop">🛒 Магазин</button>
+            <button class="nav-btn" data-view="inventory">🎒 Инвентарь</button>
+            <button class="nav-btn" data-view="achievements">🏆 Ачивки</button>
         </footer>
 
     </div>
 
-    <!-- Модальные окна -->
-    <div id="shop-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>🛒 Магазин</h2>
-            <div class="shop-grid" id="shop-items">
-                <!-- Товары добавляются через JS -->
-            </div>
+    <!-- Модалка кейса -->
+    <div id="case-modal" class="modal hidden">
+        <div class="modal-content case-open">
+            <h2>📦 Открытие кейса!</h2>
+            <div id="case-result"></div>
+            <button id="case-close-btn" class="action-btn">🎁 Забрать!</button>
         </div>
     </div>
 
-    <div id="inventory-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>🎒 Инвентарь</h2>
-            <div class="inventory-grid" id="inventory-items">
-                <p>Пока пусто. Купи что-нибудь в магазине!</p>
+    <!-- Модалка ачивки -->
+    <div id="achieve-popup" class="achieve-popup hidden">
+        <div class="achieve-popup-content">
+            <span class="achieve-icon">🏆</span>
+            <div>
+                <strong id="achieve-name">Достижение!</strong>
+                <p id="achieve-desc">Описание</p>
             </div>
-        </div>
-    </div>
-
-    <div id="chat-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>💬 Чат</h2>
-            <div class="chat-messages" id="chat-messages"></div>
-            <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Напиши сообщение...">
-                <button id="send-chat">Отправить</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="friends-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>👫 Друзья</h2>
-            <div id="friends-list">
-                <div class="friend-card">🧑 Сапфир — <span class="online">В сети</span></div>
-                <div class="friend-card">👩 Элина — <span class="online">В сети</span></div>
-                <div class="friend-card">👧 Алина — <span class="offline">Не в сети</span></div>
-                <div class="friend-card">👦 Максим — <span class="online">В сети</span></div>
-                <div class="friend-card">👩‍🦰 Катя — <span class="offline">Не в сети</span></div>
-            </div>
-            <button class="add-friend-btn">+ Добавить друга</button>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
-  </html>
+</html>
