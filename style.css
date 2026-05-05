@@ -1,0 +1,509 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a2e;
+    color: #fff;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Загрузочный экран */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #16213e, #0f3460);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.game-title {
+    font-size: 3rem;
+    background: linear-gradient(45deg, #e94560, #533483, #0f3460);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2rem;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.loading-bar {
+    width: 300px;
+    height: 12px;
+    background: #333;
+    border-radius: 10px;
+    margin: 0 auto 1rem auto;
+    overflow: hidden;
+}
+
+.loading-progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #e94560, #f39c12);
+    border-radius: 10px;
+    animation: loadAnim 2s forwards;
+}
+
+@keyframes loadAnim {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+/* Контейнер игры */
+.game-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.game-container.hidden {
+    display: none;
+}
+
+/* Верхняя панель */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    background: #16213e;
+    border-bottom: 2px solid #0f3460;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.avatar {
+    font-size: 2rem;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.avatar:hover {
+    transform: scale(1.2);
+}
+
+.currency-panel {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.currency {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: bold;
+}
+
+.coin-icon, .gem-icon {
+    font-size: 1.3rem;
+}
+
+.level-display {
+    background: rgba(233,69,96,0.2);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    color: #e94560;
+    font-weight: bold;
+}
+
+/* Основная область */
+.main-area {
+    flex: 1;
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Виды */
+.map-view, .location-view, .minigame-view {
+    display: none;
+}
+
+.map-view.active, .location-view.active, .minigame-view.active {
+    display: block;
+}
+
+/* Карта */
+.world-map {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.2rem;
+    margin-top: 1.5rem;
+}
+
+.location-card {
+    background: #16213e;
+    border: 2px solid #0f3460;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.3s, border-color 0.3s;
+    cursor: pointer;
+}
+
+.location-card:hover {
+    transform: translateY(-5px);
+    border-color: #e94560;
+}
+
+.location-card.forest:hover { border-color: #27ae60; }
+.location-card.pier:hover { border-color: #3498db; }
+.location-card.mountains:hover { border-color: #95a5a6; }
+.location-card.beach:hover { border-color: #f39c12; }
+.location-card.square:hover { border-color: #e94560; }
+.location-card.residential:hover { border-color: #9b59b6; }
+.location-card.park:hover { border-color: #2ecc71; }
+.location-card.mall:hover { border-color: #e74c3c; }
+
+.location-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.location-card h3 {
+    margin-bottom: 0.3rem;
+}
+
+.location-card p {
+    color: #888;
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+}
+
+.players-count {
+    display: block;
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-bottom: 0.8rem;
+}
+
+.enter-btn {
+    background: #e94560;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.enter-btn:hover {
+    background: #c0392b;
+}
+
+/* Локация */
+.back-btn {
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.location-scene {
+    display: flex;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.scene-area {
+    flex: 2;
+    min-height: 300px;
+    background: #16213e;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+.players-here {
+    flex: 1;
+    background: #16213e;
+    border-radius: 15px;
+    padding: 1rem;
+}
+
+.players-here h4 {
+    margin-bottom: 0.8rem;
+    color: #e94560;
+}
+
+.players-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.player-dot {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #0f3460;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.location-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.mini-game-btn {
+    background: #f39c12;
+    color: #fff;
+}
+
+.mini-game-btn:hover {
+    background: #e67e22;
+}
+
+.collect-btn {
+    background: #27ae60;
+    color: #fff;
+}
+
+.collect-btn:hover {
+    background: #229954;
+}
+
+/* Мини-игра */
+.minigame-view h2 {
+    margin-bottom: 1rem;
+}
+
+#minigame-content {
+    background: #16213e;
+    border-radius: 15px;
+    padding: 2rem;
+    min-height: 300px;
+    text-align: center;
+}
+
+#minigame-score {
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #f39c12;
+}
+
+/* Нижняя панель */
+.bottom-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 0.8rem;
+    background: #16213e;
+    border-top: 2px solid #0f3460;
+    position: sticky;
+    bottom: 0;
+}
+
+.nav-btn {
+    background: transparent;
+    color: #888;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+}
+
+.nav-btn:hover, .nav-btn.active {
+    background: #0f3460;
+    color: #fff;
+}
+
+/* Модальные окна */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #1a1a2e;
+    padding: 2rem;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+}
+
+.shop-grid, .inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.shop-item {
+    background: #16213e;
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.shop-item .item-icon {
+    font-size: 2.5rem;
+}
+
+.shop-item button {
+    background: #e94560;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+/* Чат */
+.chat-messages {
+    min-height: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: #0f0f1a;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.chat-msg {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: #16213e;
+    border-radius: 8px;
+}
+
+.chat-input-area {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 0.7rem;
+    background: #0f0f1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+}
+
+.chat-input-area button {
+    background: #e94560;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Друзья */
+.friend-card {
+    background: #16213e;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.online { color: #27ae60; }
+.offline { color: #888; }
+
+.add-friend-btn {
+    background: #0f3460;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .world-map {
+        grid-template-columns: 1fr;
+    }
+    .location-scene {
+        flex-direction: column;
+    }
+    .top-bar {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+    }
+  }
