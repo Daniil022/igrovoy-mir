@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🌍 Онлайн — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+            <span class="badge dia">💎 <b id="diamonds">0</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn">👷 Бригада</a>
+        <a href="shop.html" class="tab-btn">🛒 Магазин</a>
+        <a href="online.html" class="tab-btn active">🌍 Онлайн</a>
+    </nav>
+
+    <main class="main">
+        <h2>🌍 Онлайн</h2>
+        
+        <!-- Статус -->
+        <div class="card" style="text-align:center;margin-bottom:1rem;">
+            <p>👥 Игроков онлайн: <b id="online-count">--</b></p>
+            <p>💬 Сообщений сегодня: <b id="msg-count">--</b></p>
+        </div>
+
+        <!-- Чат -->
+        <div class="card" style="margin-bottom:1rem;">
+            <h3>💬 Общий чат</h3>
+            <div id="chat-box" style="height:300px;overflow-y:auto;background:var(--bg);padding:0.5rem;border-radius:8px;margin:0.5rem 0;">
+                <p style="color:var(--text2);">Загрузка сообщений...</p>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+                <input id="chat-input" type="text" placeholder="Сообщение..." style="flex:1;padding:0.6rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+                <button id="send-msg" class="btn btn-sell" style="width:auto;">Отправить</button>
+            </div>
+        </div>
+
+        <!-- Обмен -->
+        <h3>🔄 Обмен ресурсами</h3>
+        <div class="grid" id="trade-grid"></div>
+
+        <!-- Топ игроков -->
+        <h3>🏆 Топ шахтёров</h3>
+        <div id="top-players"></div>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+// Симуляция онлайна (реальные данные через localStorage)
+const CHAT_KEY = 'shahter-mir-chat';
+const TRADES_KEY = 'shahter-mir-trades';
+
+function getChat() {
+    const raw = localStorage.getItem(CHAT_KEY);
+    return raw ? JSON.parse(raw) : [];
+}
+
+function saveChat(msgs) {
+    localStorage.setItem(CHAT_KEY, JSON.stringify(msgs.slice(-50)));
+}
+
+function getTrades() {
+    const raw = localStorage.getItem(TRADES_KEY);
+    return raw ? JSON.parse(raw) : [];
+}
+
+function saveTrades(trades) {
+    localStorage.setItem(TRADES_KEY, JSON.stringify(trades.slice(-20)));
+}
+
+function getNickname() {
+    return localStorage.getItem('shahter-mir-nick') || 'Шахтёр_' + Math.floor(Math.random()*9999);
+}
+
+function renderChat() {
+    const chatBox = document.getElementById('chat-box');
+    const msgs = getChat();
+    if (msgs.length === 0) {
+        chatBox.innerHTML = '<p style="color:var(--text2);">Пока сообщений нет. Будь первым!</p>';
+    } else {
+        chatBox.innerHTML = msgs.map(m => `
+            <div style="margin-bottom:0.4rem;padding:0.3rem 0.5rem;background:var(--card);border-radius:6px;">
+                <b style="color:var(--gold);">${m.nick}:</b> 
+                <span>${m.text}</span>
+                <small style="color:var(--text2);float:right;">${new Date(m.time).toLocaleTimeString()}</small>
+            </div>
+        `).join('');
+    }
+    chatBox.scrollTop = chatBox.scrollHeight;
+    document.getElementById('online-count').textContent = Math.floor(Math.random()*50)+10;
+    document.getElementById('msg-count').textContent = msgs.length;
+}
+
+document.getElementById('send-msg').addEventListener('click', () => {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text || text.length > 200) return;
+    
+    const msgs = getChat();
+    msgs.push({ nick: getNickname(), text, time: Date.now() });
+    saveChat(msgs);
+    input.value = '';
+    renderChat();
+    Sound.dig();
+});
+
+document.getElementById('chat-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('send-msg').click();
+});
+
+// Трейды
+function renderTrades() {
+    const trades = getTrades();
+    document.getElementById('trade-grid').innerHTML = trades.length === 0 ? 
+        '<p style="color:var(--text2);">Нет активных обменов</p>' :
+        trades.map((t,i) => `
+            <div class="card">
+                <div class="desc">${t.nick} меняет ${t.give} → ${t.want}</div>
+                <button onclick="acceptTrade(${i})" class="btn btn-boost" style="margin-top:0.3rem;">Принять</button>
+            </div>
+        `).join('');
+}
+
+function acceptTrade(i) {
+    const trades = getTrades();
+    if (i >= trades.length) return;
+    const trade = trades[i];
+    // Симуляция
+    showToast('🔄','Обмен!','Ты получил ' + trade.want);
+    trades.splice(i, 1);
+    saveTrades(trades);
+    renderTrades();
+}
+
+// Топ игроков
+function renderTop() {
+    const top = [
+        { nick:'Король_Шахты', level:99, coins:999999999 },
+        { nick:'Нефтяной_Магнат', level:87, coins:500000000 },
+        { nick:'Алмазный_Бог', level:76, coins:250000000 },
+        { nick:getNickname(), level:G.level, coins:G.coins },
+        { nick:'Новичок_Вася', level:5, coins:1500 },
+    ];
+    top.sort((a,b)=>b.level-a.level);
+    document.getElementById('top-players').innerHTML = top.map((p,i) => `
+        <div class="card" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+            <span style="font-size:1.5rem;">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]||'👤'}</span>
+            <div>
+                <b>${p.nick}</b>
+                <p style="font-size:0.7rem;color:var(--text2);">Ур.${p.level} | ${fmt(p.coins)}💰</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+document.getElementById('coins').textContent = fmt(G.coins);
+document.getElementById('diamonds').textContent = fmt(G.diamonds);
+document.getElementById('level').textContent = G.level;
+
+renderChat();
+renderTrades();
+renderTop();
+
+// Создать обмен
+setTimeout(() => {
+    const trades = getTrades();
+    if (trades.length < 5 && Math.random() < 0.3) {
+        const ores = ['Камень','Железо','Золото','Алмазы'];
+        trades.push({
+            nick: 'Шахтёр_' + Math.floor(Math.random()*9999),
+            give: Math.floor(Math.random()*50)+10 + ' ' + ores[Math.floor(Math.random()*ores.length)],
+            want: Math.floor(Math.random()*100)+50 + '💰',
+            time: Date.now()
+        });
+        saveTrades(trades);
+        renderTrades();
+    }
+}, 5000);
+</script>
+</body>
+</html>
