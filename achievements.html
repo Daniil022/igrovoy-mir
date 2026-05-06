@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🏆 Достижения — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn">👷 Бригада</a>
+        <a href="shop.html" class="tab-btn">🛒 Магазин</a>
+        <a href="oil.html" class="tab-btn">🛢 Нефть</a>
+        <a href="cases.html" class="tab-btn">📦 Кейсы</a>
+        <a href="achievements.html" class="tab-btn active">🏆</a>
+    </nav>
+
+    <main class="main">
+        <h2>🏆 Достижения</h2>
+        <p style="color:var(--text2);">Выполнено: <b id="done-count">0</b> / 25</p>
+        <div id="achieve-list"></div>
+    </main>
+</div>
+
+<script src="script.js"></script>
+<script>
+function renderAchievements() {
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('level').textContent = G.level;
+    
+    const doneCount = G.achievements.filter(a => a.done).length;
+    document.getElementById('done-count').textContent = doneCount;
+    
+    document.getElementById('achieve-list').innerHTML = G.achievements.map(a => `
+        <div class="card" style="opacity:${a.done?'1':'0.5'};border-color:${a.done?'var(--gold)':'var(--border)'};">
+            <div class="icon">${a.done ? a.icon : '🔒'}</div>
+            <div class="name">${a.name}</div>
+            <div class="desc">${a.desc}</div>
+            <div class="price">${a.done ? '✅ +'+a.reward+'💰' : 'Награда: '+a.reward+'💰'}</div>
+        </div>
+    `).join('');
+}
+
+renderAchievements();
+</script>
+</body>
+</html>
