@@ -46,57 +46,58 @@
 <script>
 let currentSection = 'pickaxes';
 
-function showSection(section) {
-    currentSection = section;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-    renderShop();
-}
+function showSection(s) { currentSection=s; document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); renderShop(); }
 
 function renderShop() {
     const grid = document.getElementById('shop-content');
-    
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('diamonds').textContent = fmt(G.diamonds);
+    document.getElementById('level').textContent = G.level;
+
     if (currentSection === 'pickaxes') {
-        const nextLevel = G.pickaxe.level + 1;
-        const nextName = PICKAXE_NAMES[nextLevel - 1] || 'МАКС';
-        const cost = G.pickaxe.cost;
+        const nl = G.pickaxe.level + 1;
+        const nn = PICKAXE_NAMES[nl-1] || 'МАКС';
         grid.innerHTML = `
             <div class="card" style="grid-column:1/-1;">
                 <div class="icon">🧰</div>
                 <div class="name">Текущая: ${G.pickaxe.name} (Ур.${G.pickaxe.level})</div>
-                <div class="desc">Сила: ${G.pickaxe.power}</div>
-                ${nextLevel <= 20 ? `
-                    <div class="price">🪙 ${fmt(cost)}</div>
-                    <button onclick="upgradePickaxe()" ${G.coins < cost ? 'disabled' : ''}>
-                        Улучшить до: ${nextName} (+${G.pickaxe.level+1})
-                    </button>
-                ` : '<p>🏆 Максимальный уровень!</p>'}
-            </div>
-        `;
+                <div class="desc">Сила клика: ${G.pickaxe.power}</div>
+                ${nl<=20?`
+                    <div class="price">🪙 ${fmt(G.pickaxe.cost)}</div>
+                    <button onclick="upgradePickaxe()" ${G.coins<G.pickaxe.cost?'disabled':''}>Улучшить → ${nn} (+2 силы)</button>
+                `:'<p>🏆 МАКСИМУМ!</p>'}
+            </div>`;
     } else if (currentSection === 'boosts') {
+        const activeBoosts = G.boosts.filter(b=>b.endTime>Date.now());
+        const hasBoost = activeBoosts.length > 0;
+        const boostTime = hasBoost ? Math.ceil((activeBoosts[0].endTime-Date.now())/1000) : 0;
+        const boostMult = hasBoost ? activeBoosts[0].mult : 1;
+        
         grid.innerHTML = `
+            ${hasBoost ? `
+            <div class="card" style="grid-column:1/-1;border-color:var(--red);">
+                <div class="icon">⚡</div>
+                <div class="name">Активен буст x${boostMult}!</div>
+                <div class="desc">Осталось: ${boostTime} сек</div>
+            </div>` : ''}
             <div class="card">
                 <div class="icon">⚡</div>
-                <div class="name">Буст x2</div>
-                <div class="desc">30 секунд</div>
-                <div class="price">🪙 200</div>
-                <button onclick="buyBoost(2,200,30)">Купить</button>
-            </div>
-            <div class="card">
-                <div class="icon">🔥</div>
-                <div class="name">Буст x5</div>
-                <div class="desc">30 секунд</div>
-                <div class="price">🪙 1000</div>
-                <button onclick="buyBoost(5,1000,30)" ${G.coins<1000?'disabled':''}>Купить</button>
+                <div class="name">Буст x3</div>
+                <div class="desc">30 секунд утроенной добычи</div>
+                <div class="price">🪙 5 000 000</div>
+                <button onclick="buyBoost(3,5000000,30)" ${G.coins<5e6||hasBoost?'disabled':''}>
+                    ${hasBoost?'Уже активен':'Купить'}
+                </button>
             </div>
             <div class="card">
                 <div class="icon">💥</div>
                 <div class="name">Буст x10</div>
-                <div class="desc">20 секунд</div>
-                <div class="price">🪙 5000</div>
-                <button onclick="buyBoost(10,5000,20)" ${G.coins<5000?'disabled':''}>Купить</button>
-            </div>
-        `;
+                <div class="desc">20 секунд удесятерённой добычи</div>
+                <div class="price">🪙 25 000 000</div>
+                <button onclick="buyBoost(10,25000000,20)" ${G.coins<25e6||hasBoost?'disabled':''}>
+                    ${hasBoost?'Уже активен':'Купить'}
+                </button>
+            </div>`;
     } else if (currentSection === 'pets') {
         grid.innerHTML = PET_DATA.map(p => {
             const owned = G.pets.includes(p.id);
@@ -105,67 +106,44 @@ function renderShop() {
                 <div class="card">
                     <div class="icon">${p.icon}</div>
                     <div class="name">${p.name}</div>
-                    <div class="desc">${p.desc}</div>
+                    <div class="desc">+${Math.floor(p.bonus*100)}% к добыче</div>
                     <div class="price">🪙 ${fmt(p.cost)}</div>
-                    ${owned ? 
-                        `<button onclick="setPet('${p.id}')" style="background:${active?'var(--green)':'var(--blue)'};color:#fff;">
-                            ${active ? '✅ Активен' : 'Выбрать'}
-                        </button>` :
+                    ${owned?
+                        `<button onclick="setPet('${p.id}')" style="background:${active?'var(--green)':'var(--blue)'};color:#fff;">${active?'✅ Активен':'Выбрать'}</button>`:
                         `<button onclick="buyPet('${p.id}',${p.cost})" ${G.coins<p.cost?'disabled':''}>Купить</button>`
                     }
-                </div>
-            `;
+                </div>`;
         }).join('');
     }
 }
 
 function upgradePickaxe() {
-    if (G.coins < G.pickaxe.cost || G.pickaxe.level >= 20) return;
-    G.coins -= G.pickaxe.cost;
+    if (G.coins<G.pickaxe.cost||G.pickaxe.level>=20) return;
+    G.coins-=G.pickaxe.cost;
     G.pickaxe.level++;
-    G.pickaxe.name = PICKAXE_NAMES[G.pickaxe.level - 1];
-    G.pickaxe.power = G.pickaxe.level * 3;
-    G.pickaxe.cost = Math.floor(G.pickaxe.cost * 2.5);
-    Sound.dig();
-    checkAchievements();
-    updateUI();
-    renderShop();
+    G.pickaxe.name=PICKAXE_NAMES[G.pickaxe.level-1];
+    G.pickaxe.power=G.pickaxe.level*2;
+    G.pickaxe.cost=Math.floor(G.pickaxe.cost*3);
+    Sound.dig(); checkAchievements(); renderShop(); saveGame();
 }
 
-function buyBoost(mult, cost, duration) {
-    if (G.coins < cost) return;
-    G.coins -= cost;
-    G.boosts.push({ mult, endTime: Date.now() + duration * 1000 });
-    Sound.rare();
-    updateUI();
-    renderShop();
+function buyBoost(mult,cost,dur) {
+    if (G.coins<cost||G.boosts.filter(b=>b.endTime>Date.now()).length>0) return;
+    G.coins-=cost;
+    G.boosts.push({mult,endTime:Date.now()+dur*1000});
+    Sound.rare(); renderShop(); saveGame();
+    showToast('⚡','Буст активирован!','x'+mult+' на '+dur+' сек');
 }
 
-function buyPet(id, cost) {
-    if (G.coins < cost) return;
-    G.coins -= cost;
-    G.pets.push(id);
-    if (!G.activePet) G.activePet = id;
-    Sound.achieve();
-    checkAchievements();
-    updateUI();
-    renderShop();
+function buyPet(id,cost) {
+    if (G.coins<cost) return;
+    G.coins-=cost; G.pets.push(id);
+    if(!G.activePet) G.activePet=id;
+    Sound.achieve(); checkAchievements(); renderShop(); saveGame();
 }
 
-function setPet(id) {
-    G.activePet = G.activePet === id ? null : id;
-    updateUI();
-    renderShop();
-}
+function setPet(id) { G.activePet=G.activePet===id?null:id; renderShop(); saveGame(); }
 
-function updateUI() {
-    document.getElementById('coins').textContent = fmt(G.coins);
-    document.getElementById('diamonds').textContent = fmt(G.diamonds);
-    document.getElementById('level').textContent = G.level;
-    saveGame();
-}
-
-updateUI();
 renderShop();
 </script>
 </body>
