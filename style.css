@@ -1,3 +1,5 @@
+/* ==================== ШАХТЁР-МИР — ПОЛНЫЙ СТИЛЬ ==================== */
+
 :root {
     --bg: #0a0603;
     --bg2: #140d08;
@@ -16,7 +18,11 @@
     --shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -40,17 +46,37 @@ body.light {
     --text2: #7a6855;
 }
 
-/* Загрузка */
+/* ==================== ЗАГРУЗКА ==================== */
 #loading {
-    position: fixed; inset: 0; z-index: 9999;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
     background: radial-gradient(ellipse at center, #2d1800 0%, #0a0500 100%);
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: opacity 0.5s;
 }
-#loading.hidden { opacity: 0; pointer-events: none; }
-.load-box { text-align: center; }
-.load-icon { font-size: 5rem; animation: float 2s ease-in-out infinite; }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-25px)} }
+
+#loading.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.load-box {
+    text-align: center;
+}
+
+.load-icon {
+    font-size: 5rem;
+    animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-25px); }
+}
+
 .load-box h1 {
     font-size: 2.2rem;
     background: linear-gradient(45deg, var(--gold), #ff6b00);
@@ -58,211 +84,891 @@ body.light {
     -webkit-text-fill-color: transparent;
     margin: 0.5rem 0;
 }
+
 .load-bar {
-    width: 250px; height: 8px; background: #333;
-    border-radius: 4px; margin: 1rem auto; overflow: hidden;
-}
-.load-fill {
-    height: 100%; background: linear-gradient(90deg, var(--gold), var(--red));
-    border-radius: 4px; animation: loadAnim 2s forwards;
-}
-@keyframes loadAnim { from{width:0} to{width:100%} }
-#load-tip { color: var(--text2); font-size: 0.85rem; margin-top: 0.5rem; }
-
-/* Приложение */
-#app.hidden { display: none; }
-
-/* Хедер */
-.h {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0.6rem 0.8rem; background: var(--bg2);
-    border-bottom: 1px solid var(--border); position: sticky; top: 0;
-    z-index: 100; gap: 0.3rem;
-}
-.h-res { display: flex; gap: 0.3rem; flex-wrap: wrap; }
-.badge {
-    font-size: 0.7rem; font-weight: bold; padding: 0.25rem 0.5rem;
-    border-radius: 10px; background: var(--card); border: 1px solid var(--border);
-}
-.badge.coin { color: var(--gold); }
-.badge.dia { color: #00bcd4; }
-.badge.oil { color: #7f8c8d; }
-.badge.en { color: #f39c12; }
-.h-lvl { text-align: center; font-size: 0.8rem; }
-.xp-mini { width: 50px; height: 3px; background: #333; border-radius: 2px; margin-top: 2px; }
-.xp-mini-fill { height: 100%; background: var(--gold); border-radius: 2px; width: 0%; transition: width 0.3s; }
-
-/* Табы */
-.tabs {
-    display: flex; background: var(--bg2); border-bottom: 1px solid var(--border);
-    position: sticky; top: 48px; z-index: 99; overflow-x: auto;
-}
-.tab-btn {
-    flex: 1; min-width: 44px; padding: 0.6rem 0.3rem; background: transparent;
-    border: none; color: var(--text2); font-size: 1rem; cursor: pointer;
-    transition: all 0.2s; border-bottom: 2px solid transparent;
-}
-.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); background: var(--card); }
-
-/* Контент */
-.main { padding: 0.8rem; max-width: 600px; margin: 0 auto; }
-.tab { display: none; }
-.tab.active { display: block; }
-h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--gold); }
-
-/* Шахта */
-.shaft {
-    height: 180px; background: linear-gradient(180deg, #2d1800 0%, #0a0500 100%);
-    border-radius: var(--radius); margin-bottom: 0.8rem; position: relative;
-    border: 2px solid var(--border); overflow: hidden;
-}
-.miner {
-    font-size: 3.5rem; position: absolute; bottom: 15px; left: 50%;
-    transform: translateX(-50%); animation: minerAnim 0.8s infinite alternate;
-    cursor: pointer; z-index: 2;
-}
-@keyframes minerAnim { from{bottom:15px} to{bottom:28px} }
-.miner:active { animation: minerHit 0.15s; }
-@keyframes minerHit { 0%{transform:translateX(-50%) rotate(0)} 50%{transform:translateX(-50%) rotate(-35deg) scale(1.1)} 100%{transform:translateX(-50%) rotate(0)} }
-.ore-pop {
-    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-    font-size: 1.8rem; pointer-events: none; opacity: 0; transition: all 0.4s;
-}
-.ore-pop.show { opacity: 1; top: -15px; }
-
-/* Кнопки */
-.dig {
-    display: block; width: 90%; max-width: 320px; margin: 0 auto; padding: 1rem;
-    font-size: 1.3rem; font-weight: bold;
-    background: linear-gradient(180deg, #8B4513, #5C2E00);
-    color: var(--gold); border: 3px solid var(--gold);
-    border-radius: 25px; cursor: pointer;
-    box-shadow: 0 0 20px rgba(241,196,15,0.2);
-    transition: all 0.1s;
-}
-.dig:active { transform: scale(0.95); background: #3d1a00; }
-
-.xp-bar {
-    width: 90%; max-width: 320px; height: 12px; background: #1a0f00;
-    border-radius: 6px; margin: 0.6rem auto; border: 1px solid var(--border);
+    width: 250px;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    margin: 1rem auto;
     overflow: hidden;
 }
+
+.load-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--red));
+    border-radius: 4px;
+    animation: loadAnim 2s forwards;
+}
+
+@keyframes loadAnim {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+#load-tip {
+    color: var(--text2);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* ==================== ПРИЛОЖЕНИЕ ==================== */
+#app.hidden {
+    display: none;
+}
+
+/* ==================== ХЕДЕР ==================== */
+.h {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.7rem;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 0.3rem;
+}
+
+.h-left,
+.h-right {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.h-center {
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+.badge {
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.badge.coin { color: var(--gold); }
+.badge.dia { color: #00bcd4; }
+.badge.en { color: #f39c12; }
+.badge.oil { color: #7f8c8d; }
+
+.xp-mini {
+    width: 50px;
+    height: 3px;
+    background: #333;
+    border-radius: 2px;
+    margin-top: 2px;
+}
+
+.xp-mini-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* ==================== ГАМБУРГЕР ==================== */
+.burger-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    line-height: 1;
+}
+
+.burger-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    transition: opacity 0.3s;
+}
+
+.burger-overlay.hidden {
+    display: none;
+}
+
+.burger-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100%;
+    background: var(--bg2);
+    z-index: 201;
+    padding: 1rem;
+    overflow-y: auto;
+    transition: transform 0.3s;
+    border-left: 2px solid var(--border);
+}
+
+.burger-menu.hidden {
+    transform: translateX(100%);
+}
+
+.burger-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--gold);
+}
+
+.burger-close {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
+.burger-link {
+    display: block;
+    padding: 0.8rem 1rem;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 0.2rem;
+    transition: background 0.2s;
+}
+
+.burger-link:hover,
+.burger-link.active {
+    background: var(--card);
+    color: var(--gold);
+}
+
+.burger-link.active {
+    font-weight: bold;
+}
+
+/* ==================== ТАБЫ (старые, для других страниц) ==================== */
+.tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    gap: 0;
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    min-width: auto;
+    padding: 0.6rem 0.8rem;
+    background: transparent;
+    border: none;
+    color: var(--text2);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+}
+
+.tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+    background: var(--card);
+}
+
+/* ==================== ОСНОВНОЙ КОНТЕНТ ==================== */
+.main {
+    padding: 0.8rem;
+    max-width: 600px;
+    margin: 0 auto;
+    padding-bottom: 80px;
+}
+
+h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--gold);
+}
+
+h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+/* ==================== ШАХТА ==================== */
+.shaft {
+    height: 180px;
+    background: linear-gradient(180deg, #2d1800 0%, #0a0500 100%);
+    border-radius: var(--radius);
+    margin-bottom: 0.8rem;
+    position: relative;
+    border: 2px solid var(--border);
+    overflow: hidden;
+}
+
+.shaft-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.1;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 20px,
+        rgba(241,196,15,0.05) 20px,
+        rgba(241,196,15,0.05) 21px
+    );
+}
+
+.miner {
+    font-size: 3.5rem;
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: minerAnim 0.8s infinite alternate;
+    cursor: pointer;
+    z-index: 2;
+}
+
+@keyframes minerAnim {
+    from { bottom: 15px; }
+    to { bottom: 28px; }
+}
+
+.miner:active {
+    animation: minerHit 0.15s;
+}
+
+@keyframes minerHit {
+    0% { transform: translateX(-50%) rotate(0); }
+    50% { transform: translateX(-50%) rotate(-35deg) scale(1.1); }
+    100% { transform: translateX(-50%) rotate(0); }
+}
+
+.ore-pop {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    font-weight: bold;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.4s;
+    color: var(--gold);
+    text-shadow: 0 0 10px var(--gold);
+}
+
+.ore-pop.show {
+    opacity: 1;
+    top: -20px;
+}
+
+/* ==================== КНОПКА КОПАТЬ ==================== */
+.dig {
+    display: block;
+    width: 95%;
+    max-width: 350px;
+    margin: 0 auto;
+    padding: 1rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    background: linear-gradient(180deg, #8B4513, #5C2E00);
+    color: var(--gold);
+    border: 3px solid var(--gold);
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(241,196,15,0.2);
+    transition: all 0.1s;
+    font-family: inherit;
+}
+
+.dig:active {
+    transform: scale(0.95);
+    background: #3d1a00;
+}
+
+/* ==================== ПРОГРЕСС-БАР ==================== */
+.xp-bar {
+    width: 95%;
+    max-width: 350px;
+    height: 12px;
+    background: #1a0f00;
+    border-radius: 6px;
+    margin: 0.6rem auto;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
 .xp-fill {
-    height: 100%; background: linear-gradient(90deg, #ff6b00, var(--gold));
-    border-radius: 6px; width: 0%; transition: width 0.2s;
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b00, var(--gold));
+    border-radius: 6px;
+    width: 0%;
+    transition: width 0.2s;
 }
 
-#ore-name { text-align: center; font-size: 0.9rem; margin-bottom: 0.5rem; }
+#ore-name {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--gold);
+}
 
-/* Статы */
+/* ==================== СТАТЫ 4 В РЯД ==================== */
+.stats-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+    margin: 0.8rem 0;
+}
+
+.stat-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.5rem 0.3rem;
+    text-align: center;
+}
+
+.stat-icon {
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.stat-box b {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--gold);
+}
+
+.stat-box small {
+    font-size: 0.6rem;
+    color: var(--text2);
+}
+
+/* ==================== СТАТЫ (старые, для других страниц) ==================== */
 .stats {
-    display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
-    margin: 0.8rem 0; font-size: 0.85rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 0.8rem 0;
+    font-size: 0.85rem;
 }
-.stats b { color: var(--gold); }
 
-/* Кнопки */
-.btn {
-    display: block; width: 90%; max-width: 320px; margin: 0.4rem auto; padding: 0.7rem;
-    border: none; border-radius: var(--radius); cursor: pointer;
-    font-size: 0.95rem; font-weight: bold; transition: all 0.2s;
+.stats b {
+    color: var(--gold);
 }
+
+/* ==================== НЕФТЯНОЙ БЛОК ==================== */
+.oil-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.8rem;
+    margin: 0.8rem 0;
+}
+
+.oil-block.hidden {
+    display: none;
+}
+
+.oil-block h3 {
+    color: #7f8c8d;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.oil-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.oil-stats b {
+    color: var(--gold);
+}
+
+.btn-oil {
+    display: block;
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--oil);
+    color: #fff;
+    border: 1px solid #5d7b93;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 0.5rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+/* ==================== КНОПКИ ДЕЙСТВИЙ ==================== */
+.action-btn {
+    display: block;
+    width: 100%;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0.4rem 0;
+    transition: transform 0.1s;
+    text-align: center;
+    font-family: inherit;
+}
+
+.action-btn:active {
+    transform: scale(0.97);
+}
+
+.sell-btn {
+    background: var(--green);
+    color: #fff;
+}
+
+.boost-btn {
+    background: #e67e22;
+    color: #fff;
+}
+
+.prestige-btn {
+    background: var(--purple);
+    color: #fff;
+}
+
+.daily-btn {
+    background: var(--blue);
+    color: #fff;
+}
+
+.action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+/* ==================== КНОПКИ (старые) ==================== */
+.btn {
+    display: block;
+    width: 95%;
+    max-width: 350px;
+    margin: 0.4rem auto;
+    padding: 0.7rem;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: bold;
+    transition: all 0.2s;
+    font-family: inherit;
+    text-align: center;
+    text-decoration: none;
+}
+
 .btn-sell { background: var(--green); color: #fff; }
 .btn-boost { background: #e67e22; color: #fff; }
 .btn-prestige { background: var(--purple); color: #fff; }
 .btn-daily { background: var(--blue); color: #fff; }
-.btn:active { transform: scale(0.96); }
 
-/* Сетка */
+.btn:active {
+    transform: scale(0.96);
+}
+
+/* ==================== СЕТКА КАРТОЧЕК ==================== */
 .grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 0.7rem;
 }
+
 .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 0.8rem; text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.8rem;
+    text-align: center;
     transition: all 0.2s;
 }
-.card:hover { border-color: var(--gold); }
-.card .icon { font-size: 2rem; margin-bottom: 0.3rem; }
-.card .name { font-weight: bold; font-size: 0.9rem; }
-.card .desc { font-size: 0.7rem; color: var(--text2); margin: 0.3rem 0; }
-.card .price { font-weight: bold; color: var(--gold); margin: 0.4rem 0; font-size: 0.85rem; }
-.card button {
-    width: 100%; padding: 0.5rem; background: var(--gold2); color: #1a0f00;
-    border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
-    font-size: 0.8rem;
-}
-.card button:disabled { background: #555; color: #999; cursor: not-allowed; }
 
-/* Модалки */
+.card:hover {
+    border-color: var(--gold);
+}
+
+.card .icon {
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+}
+
+.card .name {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.card .desc {
+    font-size: 0.7rem;
+    color: var(--text2);
+    margin: 0.3rem 0;
+}
+
+.card .price {
+    font-weight: bold;
+    color: var(--gold);
+    margin: 0.4rem 0;
+    font-size: 0.85rem;
+}
+
+.card button {
+    width: 100%;
+    padding: 0.5rem;
+    background: var(--gold2);
+    color: #1a0f00;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.8rem;
+    font-family: inherit;
+}
+
+.card button:disabled {
+    background: #555;
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* ==================== НИЖНЯЯ ПАНЕЛЬ ==================== */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 0.4rem 0.2rem;
+    padding-bottom: max(0.4rem, env(safe-area-inset-bottom));
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+}
+
+.bn-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    min-width: 50px;
+    font-family: inherit;
+}
+
+.bn-item.active,
+.bn-item:active {
+    color: var(--gold);
+    background: var(--card);
+}
+
+.bn-icon {
+    font-size: 1.3rem;
+}
+
+.bn-label {
+    font-size: 0.6rem;
+    margin-top: 2px;
+}
+
+/* ==================== МОДАЛКИ ==================== */
 .modal {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-    display: flex; align-items: center; justify-content: center;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 1000;
 }
-.modal.hidden { display: none; }
-.modal-box {
-    background: var(--card); padding: 2rem; border-radius: 20px;
-    text-align: center; border: 2px solid var(--gold); max-width: 320px; width: 90%;
-}
-.modal-box button {
-    padding: 0.7rem 1.5rem; background: var(--gold); color: #1a0f00;
-    border: none; border-radius: 15px; cursor: pointer; font-weight: bold;
-    font-size: 1rem; margin-top: 1rem;
+
+.modal.hidden {
+    display: none;
 }
 
-/* Тосты */
+.modal-box {
+    background: var(--card);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    border: 2px solid var(--gold);
+    max-width: 320px;
+    width: 90%;
+}
+
+.modal-box button {
+    padding: 0.7rem 1.5rem;
+    background: var(--gold);
+    color: #1a0f00;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-top: 1rem;
+    font-family: inherit;
+}
+
+#case-loot {
+    font-size: 3rem;
+    margin: 1rem 0;
+}
+
+#case-text {
+    font-size: 1.1rem;
+    color: var(--gold);
+}
+
+/* ==================== ТОСТЫ ==================== */
 .toast {
-    position: fixed; top: 60px; right: 10px; z-index: 999;
-    background: var(--card); border: 2px solid var(--gold); border-radius: 15px;
-    padding: 0.8rem; display: flex; align-items: center; gap: 0.6rem;
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    z-index: 999;
+    background: var(--card);
+    border: 2px solid var(--gold);
+    border-radius: 15px;
+    padding: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     box-shadow: 0 0 20px rgba(241,196,15,0.4);
     animation: slideIn 0.5s ease;
     max-width: 280px;
 }
-.toast.hidden { display: none; }
-#toast-icon { font-size: 1.8rem; }
-#toast-title { font-weight: bold; color: var(--gold); font-size: 0.9rem; }
-#toast-text { font-size: 0.75rem; color: var(--text2); }
+
+.toast.hidden {
+    display: none;
+}
+
+#toast-icon {
+    font-size: 1.8rem;
+}
+
+#toast-title {
+    font-weight: bold;
+    color: var(--gold);
+    font-size: 0.9rem;
+}
+
+#toast-text {
+    font-size: 0.75rem;
+    color: var(--text2);
+}
+
 @keyframes slideIn {
-    from{transform:translateX(120%);opacity:0}
-    to{transform:translateX(0);opacity:1}
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
-/* Буст-индикатор */
+/* ==================== БУСТ-ИНДИКАТОР ==================== */
 .boost {
-    position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
-    background: #e74c3c; color: #fff; padding: 0.5rem 1.5rem;
-    border-radius: 20px; font-weight: bold; z-index: 200;
-    animation: pulse 0.5s infinite;
-}
-.boost.hidden { display: none; }
-@keyframes pulse {
-    0%,100%{box-shadow:0 0 10px #e74c3c}
-    50%{box-shadow:0 0 30px #e74c3c}
-}
-
-/* Нефтяной блок */
-.oil-block {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 0.8rem; margin: 0.8rem 0;
-}
-.oil-block.hidden { display: none; }
-.oil-block h3 { color: var(--oil); font-size: 1rem; margin-bottom: 0.5rem; }
-
-/* Адаптив */
-@media (max-width: 380px) {
-    .h { padding: 0.4rem 0.5rem; }
-    .badge { font-size: 0.65rem; padding: 0.2rem 0.4rem; }
-    .tabs { top: 40px; }
-    .tab-btn { font-size: 0.8rem; padding: 0.5rem 0.2rem; }
-    .grid { grid-template-columns: 1fr 1fr; }
-    .dig { font-size: 1.1rem; padding: 0.8rem; }
-    h2 { font-size: 1.1rem; }
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #e74c3c;
+    color: #fff;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: bold;
+    z-index: 200;
+    animation: boostPulse 0.5s infinite;
 }
 
-/* Светлая тема */
-body.light .shaft { background: linear-gradient(180deg, #d4c4a8 0%, #b8a080 100%); }
-body.light .card { background: #fff; }
-body.light .dig { background: linear-gradient(180deg, #a0522d, #6b3a1f); }
+.boost.hidden {
+    display: none;
+}
+
+@keyframes boostPulse {
+    0%, 100% { box-shadow: 0 0 10px #e74c3c; }
+    50% { box-shadow: 0 0 30px #e74c3c; }
+}
+
+/* ==================== СВЕТЛАЯ ТЕМА ==================== */
+body.light .shaft {
+    background: linear-gradient(180deg, #d4c4a8 0%, #b8a080 100%);
+}
+
+body.light .card {
+    background: #fff;
+}
+
+body.light .dig {
+    background: linear-gradient(180deg, #a0522d, #6b3a1f);
+}
+
+body.light .loading {
+    background: radial-gradient(ellipse at center, #f5e6d3 0%, #ede4d6 100%);
+}
+
+/* ==================== ПОЛЕ ВВОДА ==================== */
+input[type="text"] {
+    width: 100%;
+    padding: 0.6rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+/* ==================== ЧАТ ==================== */
+#chat-box {
+    height: 300px;
+    overflow-y: auto;
+    background: var(--bg);
+    padding: 0.5rem;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+}
+
+.chat-msg {
+    margin-bottom: 0.4rem;
+    padding: 0.3rem 0.5rem;
+    background: var(--card);
+    border-radius: 6px;
+}
+
+/* ==================== АДАПТИВ ==================== */
+@media (max-width: 400px) {
+    .stats-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .badge {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.3rem;
+    }
+    
+    .bn-label {
+        font-size: 0.55rem;
+    }
+    
+    .h {
+        padding: 0.3rem 0.4rem;
+    }
+    
+    .dig {
+        font-size: 1.1rem;
+        padding: 0.8rem;
+    }
+    
+    h2 {
+        font-size: 1.1rem;
+    }
+    
+    .tab-btn {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.5rem;
+    }
+    
+    .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .stats-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.3rem;
+    }
+    
+    .stat-box {
+        padding: 0.3rem 0.2rem;
+    }
+    
+    .stat-box b {
+        font-size: 0.9rem;
+    }
+    
+    .bn-item {
+        min-width: 40px;
+        padding: 0.2rem 0.3rem;
+    }
+    
+    .bn-icon {
+        font-size: 1.1rem;
+    }
+}
+
+/* ==================== СКРОЛЛБАР ==================== */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+/* ==================== ВЫДЕЛЕНИЕ ==================== */
+::selection {
+    background: var(--gold2);
+    color: #1a0f00;
+}
+
+/* ==================== АНИМАЦИИ ДЛЯ КЕЙСОВ ==================== */
+@keyframes caseShake {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.case-anim {
+    font-size: 4rem;
+    animation: caseShake 0.5s infinite;
+}
