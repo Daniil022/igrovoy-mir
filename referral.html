@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>👥 Рефералы — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+            <span class="badge dia">💎 <b id="diamonds">0</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="online.html" class="tab-btn">🌍 Онлайн</a>
+        <a href="referral.html" class="tab-btn active">👥 Рефералы</a>
+    </nav>
+
+    <main class="main">
+        <h2>👥 Реферальная система</h2>
+        
+        <div class="card" style="text-align:center;margin-bottom:1rem;">
+            <div class="icon" style="font-size:3rem;">👥</div>
+            <p>Приглашай друзей и получай бонусы!</p>
+            <p style="color:var(--gold);">🎁 +500💰 за каждого друга</p>
+            <p style="color:var(--purple);">💎 +1💎 за каждые 5 друзей</p>
+        </div>
+
+        <div class="card" style="margin-bottom:1rem;">
+            <h3>🔗 Твоя реферальная ссылка</h3>
+            <div style="background:var(--bg);padding:0.8rem;border-radius:8px;word-break:break-all;margin:0.5rem 0;">
+                <code id="ref-link">https://daniil022.github.io/igrovoy-mir/?ref=</code>
+            </div>
+            <button id="copy-ref" class="btn btn-sell" style="width:100%;">📋 Скопировать ссылку</button>
+        </div>
+
+        <div class="card">
+            <h3>📊 Статистика</h3>
+            <p>Приглашено друзей: <b id="ref-count">0</b></p>
+            <p>Заработано бонусов: <b id="ref-bonus">0</b>💰</p>
+        </div>
+
+        <div id="ref-list" style="margin-top:1rem;"></div>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+// Генерация реферального кода
+function getRefCode() {
+    let code = localStorage.getItem('shahter-mir-refcode');
+    if (!code) {
+        code = 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        localStorage.setItem('shahter-mir-refcode', code);
+    }
+    return code;
+}
+
+function getRefData() {
+    const raw = localStorage.getItem('shahter-mir-refs');
+    return raw ? JSON.parse(raw) : { referrals: [], bonus: 0 };
+}
+
+function saveRefData(data) {
+    localStorage.setItem('shahter-mir-refs', JSON.stringify(data));
+}
+
+// Проверка реферала при загрузке
+function checkRefOnLoad() {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref && ref !== getRefCode() && !localStorage.getItem('shahter-mir-referred')) {
+        localStorage.setItem('shahter-mir-referred', ref);
+        // Даём бонус новому игроку
+        G.coins += 200;
+        G.diamonds += 1;
+        saveGame();
+        // Даём бонус пригласившему (в localStorage)
+        const allRefs = JSON.parse(localStorage.getItem('shahter-mir-all-refs') || '{}');
+        if (allRefs[ref]) {
+            allRefs[ref].count = (allRefs[ref].count || 0) + 1;
+            allRefs[ref].bonus = (allRefs[ref].bonus || 0) + 500;
+        } else {
+            allRefs[ref] = { count: 1, bonus: 500 };
+        }
+        localStorage.setItem('shahter-mir-all-refs', JSON.stringify(allRefs));
+    }
+}
+
+function renderReferral() {
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('diamonds').textContent = fmt(G.diamonds);
+    document.getElementById('level').textContent = G.level;
+    
+    const code = getRefCode();
+    document.getElementById('ref-link').textContent = 
+        'https://daniil022.github.io/igrovoy-mir/?ref=' + code;
+    
+    const allRefs = JSON.parse(localStorage.getItem('shahter-mir-all-refs') || '{}');
+    const myData = allRefs[code] || { count: 0, bonus: 0 };
+    document.getElementById('ref-count').textContent = myData.count || 0;
+    document.getElementById('ref-bonus').textContent = fmt(myData.bonus || 0);
+}
+
+document.getElementById('copy-ref').addEventListener('click', () => {
+    const link = document.getElementById('ref-link').textContent;
+    navigator.clipboard.writeText(link).then(() => {
+        showToast('📋','Скопировано!','Отправь ссылку другу');
+    }).catch(() => {
+        showToast('📋','Не скопировано','Выдели и скопируй вручную');
+    });
+});
+
+checkRefOnLoad();
+renderReferral();
+</script>
+</body>
+</html>
