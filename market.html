@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>💰 Биржа — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn">👷 Бригада</a>
+        <a href="shop.html" class="tab-btn">🛒 Магазин</a>
+        <a href="market.html" class="tab-btn active">💰 Биржа</a>
+    </nav>
+
+    <main class="main">
+        <h2>💰 Биржа ресурсов</h2>
+        <p style="color:var(--text2);margin-bottom:1rem;">Цены обновляются каждые 30 секунд</p>
+        <div class="grid" id="market-grid"></div>
+        <button id="refresh-market" class="btn btn-boost" style="width:100%;margin-top:1rem;">🔄 Обновить цены (бесплатно)</button>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+const ORE_ICONS = { stone:'🪨', iron:'🔩', gold:'🥇', diamond:'💎', crystal:'💠', energite:'⚡', mithril:'🌟', uranium:'☢', oil:'🛢' };
+const ORE_NAMES = { stone:'Камень', iron:'Железо', gold:'Золото', diamond:'Алмаз', crystal:'Кристалл', energite:'Энергит', mithril:'Мифрил', uranium:'Уран', oil:'Нефть' };
+
+function updateMarket() {
+    // Случайное изменение цен
+    for (const key in G.marketPrices) {
+        const change = (Math.random() - 0.5) * 0.2;
+        G.marketPrices[key] = Math.max(1, Math.floor(G.marketPrices[key] * (1 + change)));
+    }
+}
+
+function renderMarket() {
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('level').textContent = G.level;
+    
+    document.getElementById('market-grid').innerHTML = Object.entries(G.marketPrices).map(([key, price]) => {
+        const amount = G.ores[key] || 0;
+        return `
+            <div class="card">
+                <div class="icon">${ORE_ICONS[key]}</div>
+                <div class="name">${ORE_NAMES[key]}</div>
+                <div class="desc">В наличии: ${fmt(amount)}</div>
+                <div class="price">Цена: 🪙 ${price}/шт</div>
+                <button onclick="sellOre('${key}')" ${amount<=0?'disabled':''}>
+                    Продать всё (${fmt(amount*price)}💰)
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+function sellOre(key) {
+    const amount = G.ores[key] || 0;
+    if (amount <= 0) return;
+    const price = G.marketPrices[key];
+    const total = amount * price;
+    G.coins += total;
+    G.ores[key] = 0;
+    G.stats.coinsEarned += total;
+    Sound.sell();
+    renderMarket();
+    saveGame();
+    showToast('💰','Продано!','+' + fmt(total) + ' монет');
+}
+
+document.getElementById('refresh-market').addEventListener('click', () => {
+    updateMarket();
+    renderMarket();
+    showToast('🔄','Цены обновлены!','Проверь новые цены');
+});
+
+// Авто-обновление цен
+setInterval(() => {
+    updateMarket();
+    renderMarket();
+}, 30000);
+
+updateMarket();
+renderMarket();
+</script>
+</body>
+</html>
