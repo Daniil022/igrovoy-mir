@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🎯 Задания — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+            <span class="badge dia">💎 <b id="diamonds">0</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn">👷 Бригада</a>
+        <a href="shop.html" class="tab-btn">🛒 Магазин</a>
+        <a href="oil.html" class="tab-btn">🛢 Нефть</a>
+        <a href="cases.html" class="tab-btn">📦 Кейсы</a>
+        <a href="daily.html" class="tab-btn active">🎯 Задания</a>
+    </nav>
+
+    <main class="main">
+        <h2>🎯 Ежедневные задания</h2>
+        <p style="color:var(--text2);" id="daily-status">
+            ${G.daily.claimed ? '✅ Все задания выполнены!' : 'Выполняй задания и получи награду!'}
+        </p>
+        <div id="daily-list"></div>
+        <button id="claim-daily" class="btn btn-sell" style="margin-top:1rem;width:100%;" ${G.daily.claimed?'disabled':''}>
+            ${G.daily.claimed ? '✅ Получено' : '🎁 Забрать награду (+325💰 +1💎)'}
+        </button>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+function renderDaily() {
+    initDaily();
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('diamonds').textContent = fmt(G.diamonds);
+    document.getElementById('level').textContent = G.level;
+    
+    document.getElementById('daily-list').innerHTML = G.daily.tasks.map(t => {
+        const progress = Math.min(100, (t.current / t.target) * 100);
+        const done = t.current >= t.target;
+        return `
+            <div class="card" style="border-color:${done?'var(--green)':'var(--border)'};">
+                <div class="desc">${t.desc}</div>
+                <div class="xp-bar" style="margin:0.5rem 0;">
+                    <div class="xp-fill" style="width:${progress}%;background:${done?'var(--green)':'var(--gold)'};"></div>
+                </div>
+                <small>${t.current}/${t.target} | +${t.reward}💰</small>
+            </div>
+        `;
+    }).join('');
+}
+
+document.getElementById('claim-daily').addEventListener('click', () => {
+    checkDailyTasks();
+    if (G.daily.claimed) {
+        renderDaily();
+        showToast('🎁','Награда получена!','+325💰 +1💎');
+    } else {
+        showToast('🎯','Не всё выполнено!','Выполни все 5 заданий');
+    }
+});
+
+renderDaily();
+</script>
+</body>
+</html>
