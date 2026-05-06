@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>👷 Бригада — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+            <span class="badge dia">💎 <b id="diamonds">0</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn active">👷 Бригада</a>
+        <a href="shop.html" class="tab-btn">🛒 Магазин</a>
+        <a href="oil.html" class="tab-btn">🛢 Нефть</a>
+        <a href="cases.html" class="tab-btn">📦 Кейсы</a>
+        <a href="achievements.html" class="tab-btn">🏆</a>
+    </nav>
+
+    <main class="main">
+        <h2>👷 Бригада шахтёров</h2>
+        <p style="color:var(--text2);margin-bottom:1rem;">
+            Всего шахтёров: <b id="total-miners">1</b> | 
+            Общая сила: <b id="total-power">1</b> | 
+            Авто-добыча: <b id="total-auto">0</b>/с
+        </p>
+        <div class="grid" id="miners-grid"></div>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+function renderMiners() {
+    const grid = document.getElementById('miners-grid');
+    grid.innerHTML = MINER_DATA.map((m, i) => {
+        const count = G.miners[m.id] || 0;
+        const cost = i === 0 ? 0 : Math.floor(m.cost * Math.pow(1.3, count));
+        const canBuy = i === 0 || G.coins >= cost;
+        return `
+            <div class="card">
+                <div class="icon">${m.icon}</div>
+                <div class="name">${m.name}</div>
+                <div class="desc">Сила: ${m.power} | Имеется: ${count}</div>
+                <div class="price">${i===0 ? 'Бесплатно' : '🪙 '+fmt(cost)}</div>
+                <button onclick="hireMiner('${m.id}', ${cost})" ${!canBuy&&i>0?'disabled':''}>
+                    ${i===0 ? '✅ Нанят' : 'Нанять'}
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+function hireMiner(id, cost) {
+    if (cost > 0 && G.coins < cost) return;
+    if (cost > 0) G.coins -= cost;
+    G.miners[id] = (G.miners[id] || 0) + 1;
+    Sound.dig();
+    checkAchievements();
+    updateUI();
+    renderMiners();
+    saveGame();
+}
+
+function updateUI() {
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('diamonds').textContent = fmt(G.diamonds);
+    document.getElementById('level').textContent = G.level;
+    document.getElementById('total-miners').textContent = Object.values(G.miners).reduce((a,b)=>a+b,0);
+    document.getElementById('total-power').textContent = getMinersPower();
+    document.getElementById('total-auto').textContent = getAutoPower();
+}
+
+updateUI();
+renderMiners();
+</script>
+</body>
+</html>
