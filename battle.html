@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>⚔️ Битва — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn">👷 Бригада</a>
+        <a href="battle.html" class="tab-btn active">⚔️ Битва</a>
+    </nav>
+
+    <main class="main">
+        <h2>⚔️ Битва шахтёров</h2>
+        
+        <div class="card" style="text-align:center;margin-bottom:1rem;">
+            <div style="display:flex;justify-content:space-around;align-items:center;">
+                <div>
+                    <p style="font-size:2rem;">⛏️</p>
+                    <b>ТЫ</b>
+                    <p>Сила: <b id="my-power">1</b></p>
+                    <p>Побед: <b id="my-wins">0</b></p>
+                </div>
+                <div style="font-size:2rem;">⚔️</div>
+                <div>
+                    <p style="font-size:2rem;">👤</p>
+                    <b id="enemy-name">Противник</b>
+                    <p>Сила: <b id="enemy-power">1</b></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="text-align:center;">
+            <h3>🏟 Арена</h3>
+            <p style="color:var(--text2);">Ставка: 100💰</p>
+            <p style="color:var(--text2);">Приз победителю: 180💰</p>
+            <button id="fight-btn" class="btn btn-sell" style="width:100%;margin-top:0.5rem;">
+                ⚔️ В БИТВУ! (100💰)
+            </button>
+            <button id="find-enemy" class="btn btn-boost" style="width:100%;margin-top:0.3rem;">
+                🔍 Найти противника
+            </button>
+        </div>
+
+        <div id="battle-log" style="margin-top:1rem;"></div>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+let enemy = null;
+let wins = parseInt(localStorage.getItem('shahter-mir-wins') || '0');
+
+function generateEnemy() {
+    const level = Math.max(1, G.level + Math.floor((Math.random()-0.5)*10));
+    const power = level * (Math.floor(Math.random()*5)+3);
+    const names = ['Крот', 'Шахтёр_Боб', 'Копатель_3000', 'Рудный_Волк', 'Алмазный_Джо', 'Кирка_Смерти', 'Железный_Майк', 'Золотой_Дракон'];
+    enemy = {
+        name: names[Math.floor(Math.random()*names.length)],
+        level: level,
+        power: power
+    };
+    document.getElementById('enemy-name').textContent = enemy.name;
+    document.getElementById('enemy-power').textContent = enemy.power;
+}
+
+function updateBattleUI() {
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('level').textContent = G.level;
+    document.getElementById('my-power').textContent = getClickPower();
+    document.getElementById('my-wins').textContent = wins;
+}
+
+document.getElementById('find-enemy').addEventListener('click', () => {
+    generateEnemy();
+    updateBattleUI();
+    Sound.dig();
+    document.getElementById('battle-log').innerHTML += 
+        '<p style="color:var(--blue);">🔍 Найден противник: <b>' + enemy.name + '</b> (ур.' + enemy.level + ')</p>';
+});
+
+document.getElementById('fight-btn').addEventListener('click', () => {
+    if (G.coins < 100) { showToast('❌','Мало монет!','Нужно 100💰 для битвы'); return; }
+    if (!enemy) { showToast('❌','Нет противника!','Сначала найди врага'); return; }
+    
+    G.coins -= 100;
+    const myPower = getClickPower() + Math.floor(Math.random()*20);
+    const enemyPower = enemy.power + Math.floor(Math.random()*15);
+    
+    const log = document.getElementById('battle-log');
+    
+    if (myPower > enemyPower) {
+        const prize = 180;
+        G.coins += prize;
+        wins++;
+        G.stats.battlesWon = (G.stats.battlesWon||0) + 1;
+        localStorage.setItem('shahter-mir-wins', wins.toString());
+        log.innerHTML += '<p style="color:var(--green);">🏆 ПОБЕДА! Ты победил ' + enemy.name + '! +' + prize + '💰</p>';
+        Sound.achieve();
+    } else if (myPower === enemyPower) {
+        G.coins += 100;
+        log.innerHTML += '<p style="color:var(--gold);">🤝 НИЧЬЯ! Монеты возвращены.</p>';
+        Sound.dig();
+    } else {
+        log.innerHTML += '<p style="color:var(--red);">💀 ПОРАЖЕНИЕ! ' + enemy.name + ' оказался сильнее.</p>';
+        Sound.error();
+    }
+    
+    generateEnemy();
+    updateBattleUI();
+    saveGame();
+    log.scrollTop = log.scrollHeight;
+});
+
+generateEnemy();
+updateBattleUI();
+</script>
+</body>
+</html>
