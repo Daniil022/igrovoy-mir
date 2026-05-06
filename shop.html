@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🛒 Магазин — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+            <span class="badge dia">💎 <b id="diamonds">0</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn">👷 Бригада</a>
+        <a href="shop.html" class="tab-btn active">🛒 Магазин</a>
+        <a href="oil.html" class="tab-btn">🛢 Нефть</a>
+        <a href="cases.html" class="tab-btn">📦 Кейсы</a>
+        <a href="achievements.html" class="tab-btn">🏆</a>
+    </nav>
+
+    <main class="main">
+        <h2>🛒 Магазин</h2>
+        <div class="tabs" style="margin-bottom:1rem;">
+            <button class="tab-btn active" onclick="showSection('pickaxes')">🧰 Кирки</button>
+            <button class="tab-btn" onclick="showSection('boosts')">🔥 Бусты</button>
+            <button class="tab-btn" onclick="showSection('pets')">🐉 Питомцы</button>
+        </div>
+        <div id="shop-content" class="grid"></div>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+let currentSection = 'pickaxes';
+
+function showSection(section) {
+    currentSection = section;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    renderShop();
+}
+
+function renderShop() {
+    const grid = document.getElementById('shop-content');
+    
+    if (currentSection === 'pickaxes') {
+        const nextLevel = G.pickaxe.level + 1;
+        const nextName = PICKAXE_NAMES[nextLevel - 1] || 'МАКС';
+        const cost = G.pickaxe.cost;
+        grid.innerHTML = `
+            <div class="card" style="grid-column:1/-1;">
+                <div class="icon">🧰</div>
+                <div class="name">Текущая: ${G.pickaxe.name} (Ур.${G.pickaxe.level})</div>
+                <div class="desc">Сила: ${G.pickaxe.power}</div>
+                ${nextLevel <= 20 ? `
+                    <div class="price">🪙 ${fmt(cost)}</div>
+                    <button onclick="upgradePickaxe()" ${G.coins < cost ? 'disabled' : ''}>
+                        Улучшить до: ${nextName} (+${G.pickaxe.level+1})
+                    </button>
+                ` : '<p>🏆 Максимальный уровень!</p>'}
+            </div>
+        `;
+    } else if (currentSection === 'boosts') {
+        grid.innerHTML = `
+            <div class="card">
+                <div class="icon">⚡</div>
+                <div class="name">Буст x2</div>
+                <div class="desc">30 секунд</div>
+                <div class="price">🪙 200</div>
+                <button onclick="buyBoost(2,200,30)">Купить</button>
+            </div>
+            <div class="card">
+                <div class="icon">🔥</div>
+                <div class="name">Буст x5</div>
+                <div class="desc">30 секунд</div>
+                <div class="price">🪙 1000</div>
+                <button onclick="buyBoost(5,1000,30)" ${G.coins<1000?'disabled':''}>Купить</button>
+            </div>
+            <div class="card">
+                <div class="icon">💥</div>
+                <div class="name">Буст x10</div>
+                <div class="desc">20 секунд</div>
+                <div class="price">🪙 5000</div>
+                <button onclick="buyBoost(10,5000,20)" ${G.coins<5000?'disabled':''}>Купить</button>
+            </div>
+        `;
+    } else if (currentSection === 'pets') {
+        grid.innerHTML = PET_DATA.map(p => {
+            const owned = G.pets.includes(p.id);
+            const active = G.activePet === p.id;
+            return `
+                <div class="card">
+                    <div class="icon">${p.icon}</div>
+                    <div class="name">${p.name}</div>
+                    <div class="desc">${p.desc}</div>
+                    <div class="price">🪙 ${fmt(p.cost)}</div>
+                    ${owned ? 
+                        `<button onclick="setPet('${p.id}')" style="background:${active?'var(--green)':'var(--blue)'};color:#fff;">
+                            ${active ? '✅ Активен' : 'Выбрать'}
+                        </button>` :
+                        `<button onclick="buyPet('${p.id}',${p.cost})" ${G.coins<p.cost?'disabled':''}>Купить</button>`
+                    }
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+function upgradePickaxe() {
+    if (G.coins < G.pickaxe.cost || G.pickaxe.level >= 20) return;
+    G.coins -= G.pickaxe.cost;
+    G.pickaxe.level++;
+    G.pickaxe.name = PICKAXE_NAMES[G.pickaxe.level - 1];
+    G.pickaxe.power = G.pickaxe.level * 3;
+    G.pickaxe.cost = Math.floor(G.pickaxe.cost * 2.5);
+    Sound.dig();
+    checkAchievements();
+    updateUI();
+    renderShop();
+}
+
+function buyBoost(mult, cost, duration) {
+    if (G.coins < cost) return;
+    G.coins -= cost;
+    G.boosts.push({ mult, endTime: Date.now() + duration * 1000 });
+    Sound.rare();
+    updateUI();
+    renderShop();
+}
+
+function buyPet(id, cost) {
+    if (G.coins < cost) return;
+    G.coins -= cost;
+    G.pets.push(id);
+    if (!G.activePet) G.activePet = id;
+    Sound.achieve();
+    checkAchievements();
+    updateUI();
+    renderShop();
+}
+
+function setPet(id) {
+    G.activePet = G.activePet === id ? null : id;
+    updateUI();
+    renderShop();
+}
+
+function updateUI() {
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('diamonds').textContent = fmt(G.diamonds);
+    document.getElementById('level').textContent = G.level;
+    saveGame();
+}
+
+updateUI();
+renderShop();
+</script>
+</body>
+</html>
