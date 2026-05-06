@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🌟 Престиж — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn">👷 Бригада</a>
+        <a href="shop.html" class="tab-btn">🛒 Магазин</a>
+        <a href="achievements.html" class="tab-btn">🏆</a>
+    </nav>
+
+    <main class="main">
+        <h2>🌟 Престиж</h2>
+        <div class="card" style="text-align:center;padding:2rem;">
+            <div class="icon" style="font-size:3rem;">🌟</div>
+            <p>Престиж сбрасывает прогресс, но даёт <b>+10%</b> к добыче навсегда!</p>
+            <p style="color:var(--text2);">Сделано престижей: <b id="prestige-count">0</b></p>
+            <p style="color:var(--gold);">Текущий бонус: <b id="prestige-bonus">0%</b></p>
+            <p style="color:var(--red);margin:1rem 0;">⚠ Сбросится: уровень, руда, шахтёры, нефть, монеты (останется 100)</p>
+            <button id="do-prestige" class="btn btn-prestige" style="width:100%;" ${G.level<10?'disabled':''}>
+                ${G.level>=10 ? '🌟 СДЕЛАТЬ ПРЕСТИЖ' : 'Нужен 10 уровень'}
+            </button>
+        </div>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+function updatePrestigeUI() {
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('level').textContent = G.level;
+    document.getElementById('prestige-count').textContent = G.prestige;
+    document.getElementById('prestige-bonus').textContent = (G.prestige * 10) + '%';
+}
+
+document.getElementById('do-prestige').addEventListener('click', () => {
+    if (G.level < 10) return;
+    
+    G.prestige++;
+    G.prestigeBonus = G.prestige * 0.1;
+    
+    // Сброс
+    G.level = 1; G.xp = 0; G.xpToLevel = 100;
+    G.coins = 100; G.ores = { stone:0, iron:0, gold:0, diamond:0, crystal:0, energite:0, mithril:0, uranium:0, oil:0 };
+    G.totalOresMined = 0;
+    G.miners = { basic:1, speed:0, strong:0, expert:0, master:0, legend:0, cyber:0, magic:0, cosmic:0, god:0 };
+    G.pickaxe = { level:1, name:'Деревянная', power:1, cost:100 };
+    G.oilRigs = 0; G.oilRigCost = 200; G.barrels = 0; G.oilStored = 0;
+    
+    Sound.achieve();
+    checkAchievements();
+    updatePrestigeUI();
+    saveGame();
+    showToast('🌟','Престиж выполнен!','Бонус: +'+(G.prestige*10)+'% к добыче');
+});
+
+updatePrestigeUI();
+</script>
+</body>
+</html>
