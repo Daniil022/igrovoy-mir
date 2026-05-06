@@ -2,144 +2,228 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⛏ Шахтёр-Мир — Копай и богатей!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0603">
+    <title>⛏ Шахтёр-Мир — Шахта</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Загрузка -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-content">
-            <h1>⛏ Шахтёр-Мир</h1>
-            <div class="loading-bar"><div class="loading-progress"></div></div>
-            <p>Спускаемся в шахту...</p>
+<div id="loading">
+    <div class="load-box">
+        <div class="load-icon">⛏️</div>
+        <h1>ШАХТЁР-МИР</h1>
+        <div class="load-bar"><div class="load-fill"></div></div>
+        <p id="load-tip">💡 Совет: нанимай больше шахтёров!</p>
+    </div>
+</div>
+
+<div id="app" class="hidden">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+            <span class="badge dia">💎 <b id="diamonds">0</b></span>
+            <span class="badge oil">🛢 <b id="oil">0</b></span>
+            <span class="badge en">⚡ <b id="energy">100</b></span>
         </div>
-    </div>
-
-    <!-- Игра -->
-    <div id="game-container" class="game-container hidden">
-
-        <!-- Верхняя панель ресурсов -->
-        <header class="top-bar">
-            <div class="resources">
-                <span class="res-item stone">🪨<span id="stone">0</span></span>
-                <span class="res-item iron">🔩<span id="iron">0</span></span>
-                <span class="res-item gold">🥇<span id="gold">0</span></span>
-                <span class="res-item diamond">💎<span id="diamond">0</span></span>
-                <span class="res-item oil">🛢<span id="oil">0</span></span>
-                <span class="res-item coins">🪙<span id="coins">100</span></span>
-            </div>
-            <div class="level-info">
-                ⭐ Уровень: <span id="level">1</span>
-            </div>
-        </header>
-
-        <main class="main-area">
-            
-            <!-- Шахта -->
-            <section id="mine-view" class="view active">
-                <div class="mine-scene">
-                    
-                    <!-- Анимация -->
-                    <div class="mine-cartoon">
-                        <div class="miner-icon" id="miner-icon">⛏️</div>
-                        <div class="oil-pump" id="oil-pump">🛢️</div>
-                        <div class="ore-pop" id="ore-pop"></div>
-                    </div>
-                    
-                    <!-- Кнопка копать -->
-                    <button id="mine-btn" class="mine-btn">⛏️ КОПАТЬ!</button>
-                    
-                    <!-- Прогресс -->
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="ore-progress"></div>
-                    </div>
-                    <p id="current-ore-text">🪨 Камень</p>
-                    
-                    <!-- Статы -->
-                    <div class="stats-row">
-                        <div>👷 Шахтёры: <b id="miners-count">1</b></div>
-                        <div>⚡ Сила: <b id="click-power">1</b></div>
-                        <div>⛏ Авто-руда: <b id="auto-power">0</b>/сек</div>
-                    </div>
-                    
-                    <!-- Нефтянка -->
-                    <div class="oil-section">
-                        <h3>🛢 Нефтяная вышка</h3>
-                        <div class="stats-row">
-                            <div>🏭 Вышек: <b id="oil-rigs-count">0</b></div>
-                            <div>🛢 Бочек: <b id="barrels-count">0</b></div>
-                            <div>⏱ Добыча: <b id="oil-auto">0</b>/сек</div>
-                        </div>
-                        <button id="collect-oil-btn" class="oil-btn">🛢 Собрать нефть (<span id="oil-ready">0</span>)</button>
-                    </div>
-
-                    <!-- Кнопка продажи -->
-                    <button id="sell-all-btn" class="sell-btn">💰 ПРОДАТЬ ВСЁ</button>
-                </div>
-            </section>
-
-            <!-- Магазин -->
-            <section id="shop-view" class="view hidden">
-                <h2>🛒 Магазин</h2>
-                <div class="shop-tabs">
-                    <button class="stab active" data-tab="miners">👷 Шахтёры</button>
-                    <button class="stab" data-tab="pickaxes">🧰 Кирки</button>
-                    <button class="stab" data-tab="oilrigs">🏭 Вышки</button>
-                    <button class="stab" data-tab="barrels">🛢 Бочки</button>
-                    <button class="stab" data-tab="cases">📦 Кейсы</button>
-                    <button class="stab" data-tab="boosts">🔥 Бусты</button>
-                </div>
-                <div id="shop-content" class="shop-grid"></div>
-            </section>
-
-            <!-- Инвентарь -->
-            <section id="inventory-view" class="view hidden">
-                <h2>🎒 Инвентарь</h2>
-                <div id="inventory-content" class="inv-grid">
-                    <p style="color:#888;">Пока пусто</p>
-                </div>
-            </section>
-
-            <!-- Достижения -->
-            <section id="achievements-view" class="view hidden">
-                <h2>🏆 Достижения</h2>
-                <div id="achievements-content"></div>
-            </section>
-
-        </main>
-
-        <!-- Нижнее меню -->
-        <footer class="bottom-bar">
-            <button class="nav-btn active" data-view="mine">⛏ Шахта</button>
-            <button class="nav-btn" data-view="shop">🛒 Магазин</button>
-            <button class="nav-btn" data-view="inventory">🎒 Инвентарь</button>
-            <button class="nav-btn" data-view="achievements">🏆 Ачивки</button>
-        </footer>
-
-    </div>
-
-    <!-- Модалка кейса -->
-    <div id="case-modal" class="modal hidden">
-        <div class="modal-content case-open">
-            <h2>📦 Открытие кейса!</h2>
-            <div id="case-result"></div>
-            <button id="case-close-btn" class="action-btn">🎁 Забрать!</button>
+        <div class="h-lvl">
+            ⭐ <b id="level">1</b>
+            <div class="xp-mini"><div class="xp-mini-fill" id="xp-mini"></div></div>
         </div>
-    </div>
+    </header>
 
-    <!-- Модалка ачивки -->
-    <div id="achieve-popup" class="achieve-popup hidden">
-        <div class="achieve-popup-content">
-            <span class="achieve-icon">🏆</span>
-            <div>
-                <strong id="achieve-name">Достижение!</strong>
-                <p id="achieve-desc">Описание</p>
-            </div>
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn active">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn">👷 Бригада</a>
+        <a href="shop.html" class="tab-btn">🛒 Магазин</a>
+        <a href="oil.html" class="tab-btn">🛢 Нефть</a>
+        <a href="cases.html" class="tab-btn">📦 Кейсы</a>
+        <a href="achievements.html" class="tab-btn">🏆</a>
+        <a href="daily.html" class="tab-btn">🎯</a>
+        <a href="market.html" class="tab-btn">💰</a>
+    </nav>
+
+    <main class="main">
+        <div class="shaft" id="shaft">
+            <div class="miner" id="miner">⛏️</div>
+            <div class="ore-pop" id="ore-pop"></div>
         </div>
-    </div>
 
-    <script src="script.js"></script>
+        <button id="dig-btn" class="dig">⛏️ КОПАТЬ! (-1⚡)</button>
+        
+        <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+        <p id="ore-name" style="text-align:center;">🪨 Камень</p>
+        
+        <div class="stats">
+            <span>👷 <b id="s-miners">1</b></span>
+            <span>⚡ Сила: <b id="s-power">1</b></span>
+            <span>⏱ Авто: <b id="s-auto">0</b>/с</span>
+        </div>
+
+        <div id="oil-block" class="oil-block hidden">
+            <h3>🛢 Нефтяная вышка</h3>
+            <div class="stats">
+                <span>🏭 <b id="s-rigs">0</b></span>
+                <span>🛢 <b id="s-barrels">0</b></span>
+                <span>⏱ <b id="s-oilrate">0</b>/с</span>
+            </div>
+            <button id="collect-oil" class="btn btn-boost">🛢 Собрать (<b id="s-oilready">0</b>)</button>
+        </div>
+
+        <button id="sell-all" class="btn btn-sell">💰 ПРОДАТЬ ВСЁ</button>
+        <button id="boost-btn" class="btn btn-boost">⚡ БУСТ x2 (200💰)</button>
+        <button onclick="location.href='prestige.html'" class="btn btn-prestige">🌟 ПРЕСТИЖ</button>
+        <button id="daily-btn" class="btn btn-daily">🎁 ЕЖЕДНЕВНЫЙ БОНУС</button>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<div id="boost-indicator" class="boost hidden">
+    ⚡ БУСТ x<span id="boost-mult">2</span> | <span id="boost-time">30</span>с
+</div>
+
+<script src="script.js"></script>
+<script>
+// ============ ЛОГИКА СТРАНИЦЫ ============
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+    }, 2000);
+    
+    updateAllUI();
+    updateMineUI();
+    
+    document.getElementById('dig-btn').addEventListener('click', dig);
+    document.getElementById('miner').addEventListener('click', dig);
+    document.getElementById('sell-all').addEventListener('click', sellAll);
+    document.getElementById('boost-btn').addEventListener('click', buyBoost);
+    document.getElementById('collect-oil')?.addEventListener('click', collectOil);
+    document.getElementById('daily-btn').addEventListener('click', claimDaily);
+});
+
+function dig() {
+    if (G.energy < 1) { Sound.error(); showToast('⚡','Нет энергии!','Подожди восстановления'); return; }
+    
+    G.energy -= 1;
+    G.stats.clicks++;
+    
+    const power = getClickPower();
+    const ore = getCurrentOre();
+    G.ores[ore.key] += power;
+    G.totalOresMined += power;
+    G.xp += power;
+    
+    // Анимация
+    const pop = document.getElementById('ore-pop');
+    pop.textContent = ore.icon;
+    pop.classList.add('show');
+    setTimeout(() => pop.classList.remove('show'), 400);
+    
+    // Звук
+    if (ore.key === 'uranium' || ore.key === 'mithril') Sound.rare();
+    else Sound.dig();
+    
+    checkLevelUp();
+    checkAchievements();
+    checkDailyTasks();
+    updateMineUI();
+}
+
+function sellAll() {
+    let total = 0;
+    for (const [key, price] of Object.entries(G.marketPrices)) {
+        total += G.ores[key] * price;
+        G.ores[key] = 0;
+    }
+    if (total === 0) { Sound.error(); return; }
+    G.coins += total;
+    G.stats.coinsEarned += total;
+    Sound.sell();
+    checkAchievements();
+    checkDailyTasks();
+    updateMineUI();
+    showToast('💰','Продано!','+' + fmt(total) + ' монет');
+}
+
+function buyBoost() {
+    if (G.coins < 200) return;
+    G.coins -= 200;
+    G.boosts.push({ mult: 2, endTime: Date.now() + 30000 });
+    
+    const indicator = document.getElementById('boost-indicator');
+    document.getElementById('boost-mult').textContent = '2';
+    document.getElementById('boost-time').textContent = '30';
+    indicator.classList.remove('hidden');
+    
+    let timeLeft = 30;
+    const timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('boost-time').textContent = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            indicator.classList.add('hidden');
+        }
+    }, 1000);
+    
+    updateMineUI();
+}
+
+function collectOil() {
+    if (G.oilStored <= 0) return;
+    G.ores.oil += G.oilStored;
+    G.stats.oilCollected += G.oilStored;
+    showToast('🛢','Нефть собрана!','+' + fmt(G.oilStored) + ' нефти');
+    G.oilStored = 0;
+    updateMineUI();
+}
+
+function claimDaily() {
+    if (G.daily.claimed) {
+        showToast('🎁','Уже получено!','Завтра будет новый бонус');
+        return;
+    }
+    checkDailyTasks();
+    if (!G.daily.claimed) {
+        showToast('🎯','Не все задания выполнены!','Выполни все задания дня');
+        return;
+    }
+    updateMineUI();
+}
+
+function updateMineUI() {
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('diamonds').textContent = fmt(G.diamonds);
+    document.getElementById('oil').textContent = fmt(G.ores.oil);
+    document.getElementById('energy').textContent = Math.floor(G.energy);
+    document.getElementById('level').textContent = G.level;
+    
+    document.getElementById('xp-fill').style.width = (G.xp / G.xpToLevel * 100) + '%';
+    document.getElementById('xp-mini').style.width = (G.xp / G.xpToLevel * 100) + '%';
+    
+    const ore = getCurrentOre();
+    document.getElementById('ore-name').textContent = ore.icon + ' ' + ore.name;
+    
+    document.getElementById('s-miners').textContent = Object.values(G.miners).reduce((a,b)=>a+b,0);
+    document.getElementById('s-power').textContent = getClickPower();
+    document.getElementById('s-auto').textContent = getAutoPower();
+    
+    // Нефтяной блок
+    const oilBlock = document.getElementById('oil-block');
+    if (G.oilRigs > 0) {
+        oilBlock.classList.remove('hidden');
+        document.getElementById('s-rigs').textContent = G.oilRigs;
+        document.getElementById('s-barrels').textContent = G.barrels;
+        document.getElementById('s-oilrate').textContent = getOilRate();
+        document.getElementById('s-oilready').textContent = fmt(G.oilStored);
+    }
+    
+    saveGame();
+}
+</script>
 </body>
 </html>
