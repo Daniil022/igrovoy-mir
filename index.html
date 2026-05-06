@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0a0603">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>⛏ Шахтёр-Мир — Копай и богатей!</title>
+    <title>⛏ Шахтёр-Мир</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ====== ЗАГРУЗКА ====== -->
+<!-- ЗАГРУЗКА -->
 <div id="loading">
     <div class="load-box">
         <div class="load-icon">⛏️</div>
@@ -21,40 +19,54 @@
     </div>
 </div>
 
-<!-- ====== ИГРА ====== -->
+<!-- ИГРА -->
 <div id="app" class="hidden">
 
     <!-- ХЕДЕР -->
     <header class="h">
-        <div class="h-res">
-            <span class="badge coin">🪙 <b id="coins">100</b></span>
-            <span class="badge dia">💎 <b id="diamonds">0</b></span>
-            <span class="badge oil">🛢 <b id="oil">0</b></span>
-            <span class="badge en">⚡ <b id="energy">100</b></span>
+        <div class="h-left">
+            <span class="badge coin">🪙<b id="coins">100</b></span>
+            <span class="badge dia">💎<b id="diamonds">0</b></span>
         </div>
-        <div class="h-lvl">
-            ⭐ Ур. <b id="level">1</b>
+        <div class="h-center">
+            ⭐<b id="level">1</b>
             <div class="xp-mini"><div class="xp-mini-fill" id="xp-mini"></div></div>
+        </div>
+        <div class="h-right">
+            <span class="badge en">⚡<b id="energy">100</b></span>
+            <button class="burger-btn" id="burger-btn">☰</button>
         </div>
     </header>
 
-    <!-- НАВИГАЦИЯ -->
-    <nav class="tabs">
-        <a href="index.html" class="tab-btn active">⛏ Шахта</a>
-        <a href="miners.html" class="tab-btn">👷 Бригада</a>
-        <a href="shop.html" class="tab-btn">🛒 Магазин</a>
-        <a href="oil.html" class="tab-btn">🛢 Нефть</a>
-        <a href="cases.html" class="tab-btn">📦 Кейсы</a>
-        <a href="achievements.html" class="tab-btn">🏆</a>
-        <a href="daily.html" class="tab-btn">🎯</a>
-        <a href="market.html" class="tab-btn">💰</a>
+    <!-- ГАМБУРГЕР-МЕНЮ -->
+    <div class="burger-overlay hidden" id="burger-overlay"></div>
+    <nav class="burger-menu hidden" id="burger-menu">
+        <div class="burger-header">
+            <span>📋 Меню</span>
+            <button class="burger-close" id="burger-close">✕</button>
+        </div>
+        <a href="index.html" class="burger-link active">⛏ Шахта</a>
+        <a href="miners.html" class="burger-link">👷 Бригада</a>
+        <a href="shop.html" class="burger-link">🛒 Магазин</a>
+        <a href="oil.html" class="burger-link">🛢 Нефть</a>
+        <a href="cases.html" class="burger-link">📦 Кейсы</a>
+        <a href="achievements.html" class="burger-link">🏆 Достижения</a>
+        <a href="daily.html" class="burger-link">🎯 Задания</a>
+        <a href="market.html" class="burger-link">💰 Биржа</a>
+        <hr style="border-color:var(--border);margin:0.5rem 0;">
+        <a href="online.html" class="burger-link">🌍 Чат</a>
+        <a href="referral.html" class="burger-link">👥 Друзья</a>
+        <a href="battle.html" class="burger-link">⚔️ Битва</a>
+        <a href="prestige.html" class="burger-link">🌟 Престиж</a>
+        <a href="settings.html" class="burger-link">⚙️ Настройки</a>
     </nav>
 
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <!-- КОНТЕНТ -->
     <main class="main">
         
         <!-- ШАХТА -->
         <div class="shaft" id="shaft">
+            <div class="shaft-bg"></div>
             <div class="miner" id="miner">⛏️</div>
             <div class="ore-pop" id="ore-pop"></div>
         </div>
@@ -64,89 +76,140 @@
         
         <!-- ПРОГРЕСС -->
         <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
-        <p id="ore-name" style="text-align:center;">🪨 Камень</p>
+        <p id="ore-name">🪨 Камень</p>
         
-        <!-- СТАТЫ -->
-        <div class="stats">
-            <span>👷 <b id="s-miners">1</b></span>
-            <span>⚡ Сила: <b id="s-power">1</b></span>
-            <span>⏱ Авто: <b id="s-auto">0</b>/с</span>
-            <span>🧰 <b id="s-pick">Деревянная</b></span>
+        <!-- СТАТЫ (4 в ряд) -->
+        <div class="stats-grid-4">
+            <div class="stat-box">
+                <span class="stat-icon">👷</span>
+                <b id="s-miners">1</b>
+                <small>Шахтёров</small>
+            </div>
+            <div class="stat-box">
+                <span class="stat-icon">⚡</span>
+                <b id="s-power">1</b>
+                <small>Сила</small>
+            </div>
+            <div class="stat-box">
+                <span class="stat-icon">⏱</span>
+                <b id="s-auto">0</b>
+                <small>Авто/с</small>
+            </div>
+            <div class="stat-box">
+                <span class="stat-icon">🧰</span>
+                <b id="s-pick">Дерево</b>
+                <small>Кирка</small>
+            </div>
         </div>
 
         <!-- НЕФТЯНОЙ БЛОК -->
         <div id="oil-block" class="oil-block hidden">
             <h3>🛢 Нефтяная вышка</h3>
-            <div class="stats">
+            <div class="oil-stats">
                 <span>🏭 <b id="s-rigs">0</b></span>
                 <span>🛢 <b id="s-barrels">0</b></span>
                 <span>⏱ <b id="s-oilrate">0</b>/с</span>
             </div>
-            <button id="collect-oil" class="btn btn-boost">🛢 Собрать нефть (<b id="s-oilready">0</b>)</button>
+            <button id="collect-oil" class="btn-oil">🛢 Собрать (<b id="s-oilready">0</b>)</button>
         </div>
 
         <!-- КНОПКИ ДЕЙСТВИЙ -->
-        <button id="sell-all" class="btn btn-sell">💰 ПРОДАТЬ ВСЁ</button>
-        <button onclick="location.href='shop.html'" class="btn btn-boost">⚡ БУСТЫ (от 5M💰)</button>
-        <button onclick="location.href='prestige.html'" class="btn btn-prestige">🌟 ПРЕСТИЖ</button>
-        <button id="daily-btn" class="btn btn-daily">🎁 ЕЖЕДНЕВНЫЙ БОНУС</button>
+        <button id="sell-all" class="action-btn sell-btn">💰 ПРОДАТЬ ВСЁ</button>
+        <div class="action-row">
+            <button onclick="location.href='shop.html'" class="action-btn boost-btn">⚡ БУСТЫ</button>
+            <button onclick="location.href='prestige.html'" class="action-btn prestige-btn">🌟 ПРЕСТИЖ</button>
+        </div>
 
     </main>
 
-    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
-    <nav class="tabs" style="position:sticky;bottom:0;border-top:1px solid var(--border);">
-        <a href="online.html" class="tab-btn">🌍 Чат</a>
-        <a href="referral.html" class="tab-btn">👥 Друзья</a>
-        <a href="battle.html" class="tab-btn">⚔️ Битва</a>
-        <a href="settings.html" class="tab-btn">⚙️</a>
-    </nav>
+    <!-- НИЖНЯЯ ПАНЕЛЬ -->
+    <footer class="bottom-nav">
+        <button onclick="location.href='index.html'" class="bn-item active">
+            <span class="bn-icon">⛏</span>
+            <span class="bn-label">Шахта</span>
+        </button>
+        <button onclick="location.href='miners.html'" class="bn-item">
+            <span class="bn-icon">👷</span>
+            <span class="bn-label">Бригада</span>
+        </button>
+        <button onclick="location.href='shop.html'" class="bn-item">
+            <span class="bn-icon">🛒</span>
+            <span class="bn-label">Магазин</span>
+        </button>
+        <button onclick="location.href='cases.html'" class="bn-item">
+            <span class="bn-icon">📦</span>
+            <span class="bn-label">Кейсы</span>
+        </button>
+        <button id="bn-more" class="bn-item">
+            <span class="bn-icon">⋯</span>
+            <span class="bn-label">Ещё</span>
+        </button>
+    </footer>
 
 </div>
 
-<!-- ТОСТ УВЕДОМЛЕНИЙ -->
+<!-- ТОСТ -->
 <div id="toast" class="toast hidden">
     <span id="toast-icon"></span>
     <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
 </div>
 
-<!-- ИНДИКАТОР БУСТА -->
+<!-- БУСТ-ИНДИКАТОР -->
 <div id="boost-indicator" class="boost hidden">
     ⚡ БУСТ x<span id="boost-mult">3</span> | <span id="boost-time">30</span>с
 </div>
 
-<!-- ЗВУКИ (Web Audio API) -->
 <script src="script.js"></script>
-
-<!-- ЛОГИКА СТРАНИЦЫ -->
 <script>
-// ============ ГЛАВНАЯ ШАХТА ============
+// ============ ГЛАВНАЯ СТРАНИЦА ============
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Загрузка
     setTimeout(() => {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
     }, 2000);
     
-    // Первое обновление
     updateMineUI();
     
-    // Обработчики
+    // Копка
     document.getElementById('dig-btn').addEventListener('click', dig);
     document.getElementById('miner').addEventListener('click', dig);
-    document.getElementById('sell-all').addEventListener('click', sellAll);
-    document.getElementById('collect-oil')?.addEventListener('click', collectOil);
-    document.getElementById('daily-btn').addEventListener('click', claimDaily);
     
-    // Проверка бустов
+    // Продажа
+    document.getElementById('sell-all').addEventListener('click', sellAll);
+    
+    // Нефть
+    document.getElementById('collect-oil')?.addEventListener('click', collectOil);
+    
+    // Гамбургер-меню
+    document.getElementById('burger-btn').addEventListener('click', openBurger);
+    document.getElementById('burger-close').addEventListener('click', closeBurger);
+    document.getElementById('burger-overlay').addEventListener('click', closeBurger);
+    
+    // Кнопка "Ещё" в нижней панели
+    document.getElementById('bn-more').addEventListener('click', openBurger);
+    
     checkActiveBoosts();
 });
+
+// ============ ГАМБУРГЕР-МЕНЮ ============
+function openBurger() {
+    document.getElementById('burger-menu').classList.remove('hidden');
+    document.getElementById('burger-overlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeBurger() {
+    document.getElementById('burger-menu').classList.add('hidden');
+    document.getElementById('burger-overlay').classList.add('hidden');
+    document.body.style.overflow = '';
+}
 
 // ============ КОПКА ============
 function dig() {
     if (G.energy < 1) {
         Sound.error();
-        showToast('⚡', 'Нет энергии!', 'Подожди восстановления');
+        showToast('⚡', 'Нет энергии!', 'Жди восстановления');
         return;
     }
     
@@ -159,18 +222,11 @@ function dig() {
     G.totalOresMined += power;
     G.xp += power;
     
-    // Анимация всплывашки
+    // Всплывашка
     const pop = document.getElementById('ore-pop');
-    pop.textContent = ore.icon;
+    pop.textContent = ore.icon + ' +' + power;
     pop.classList.add('show');
-    setTimeout(() => pop.classList.remove('show'), 400);
-    
-    // Анимация шахтёра
-    const miner = document.getElementById('miner');
-    miner.style.animation = 'none';
-    miner.offsetHeight;
-    miner.style.animation = 'minerHit 0.15s';
-    setTimeout(() => { miner.style.animation = 'minerAnim 0.8s infinite alternate'; }, 150);
+    setTimeout(() => pop.classList.remove('show'), 500);
     
     // Звук
     if (ore.key === 'uranium' || ore.key === 'mithril') Sound.rare();
@@ -187,14 +243,13 @@ function dig() {
 function sellAll() {
     let total = 0;
     for (const [key, price] of Object.entries(G.marketPrices)) {
-        const amount = G.ores[key] || 0;
-        total += amount * price;
+        total += (G.ores[key] || 0) * price;
         G.ores[key] = 0;
     }
     
     if (total === 0) {
         Sound.error();
-        showToast('📦', 'Нечего продавать!', 'Добудь больше руды');
+        showToast('📦', 'Нечего продавать!', 'Копай больше руды');
         return;
     }
     
@@ -214,59 +269,32 @@ function sellAll() {
 
 // ============ НЕФТЬ ============
 function collectOil() {
-    if (G.oilStored <= 0) {
-        Sound.error();
-        showToast('🛢', 'Нет нефти!', 'Купи вышки для добычи');
-        return;
-    }
+    if (G.oilStored <= 0) return;
     
     const collected = G.oilStored;
     G.ores.oil += collected;
     G.stats.oilCollected += collected;
     G.oilStored = 0;
     
-    Sound.dig();
-    checkAchievements();
-    checkDailyTasks();
+    showToast('🛢', 'Собрано!', '+' + fmt(collected) + ' нефти');
     updateMineUI();
     saveGame();
-    
-    showToast('🛢', 'Нефть собрана!', '+' + fmt(collected) + ' нефти');
 }
 
-// ============ ЕЖЕДНЕВНЫЙ БОНУС ============
-function claimDaily() {
-    checkDailyTasks();
-    
-    if (G.daily.claimed) {
-        showToast('🎁', 'Уже получено!', 'Завтра будут новые задания');
-        return;
-    }
-    
-    if (!G.daily.claimed) {
-        showToast('🎯', 'Не всё выполнено!', 'Выполни все 5 заданий дня');
-        return;
-    }
-    
-    updateMineUI();
-}
-
-// ============ ПРОВЕРКА БУСТОВ ============
+// ============ БУСТЫ ============
 function checkActiveBoosts() {
     G.boosts = G.boosts.filter(b => b.endTime > Date.now());
     
+    const indicator = document.getElementById('boost-indicator');
     if (G.boosts.length > 0) {
         const boost = G.boosts[0];
-        const indicator = document.getElementById('boost-indicator');
         document.getElementById('boost-mult').textContent = boost.mult;
-        
         indicator.classList.remove('hidden');
         
         const updateTimer = () => {
-            const timeLeft = Math.ceil((boost.endTime - Date.now()) / 1000);
-            document.getElementById('boost-time').textContent = timeLeft;
-            
-            if (timeLeft <= 0) {
+            const t = Math.ceil((boost.endTime - Date.now()) / 1000);
+            document.getElementById('boost-time').textContent = t;
+            if (t <= 0) {
                 indicator.classList.add('hidden');
                 G.boosts = [];
                 saveGame();
@@ -276,34 +304,27 @@ function checkActiveBoosts() {
         };
         updateTimer();
     }
-    
-    saveGame();
 }
 
-// ============ ОБНОВЛЕНИЕ UI ============
+// ============ UI ============
 function updateMineUI() {
-    // Ресурсы
     document.getElementById('coins').textContent = fmt(G.coins);
     document.getElementById('diamonds').textContent = fmt(G.diamonds);
-    document.getElementById('oil').textContent = fmt(G.ores.oil);
     document.getElementById('energy').textContent = Math.floor(G.energy);
-    
-    // Уровень
     document.getElementById('level').textContent = G.level;
-    document.getElementById('xp-fill').style.width = (G.xp / G.xpToLevel * 100) + '%';
-    document.getElementById('xp-mini').style.width = (G.xp / G.xpToLevel * 100) + '%';
     
-    // Руда
+    const xpPct = Math.min(100, (G.xp / G.xpToLevel * 100));
+    document.getElementById('xp-fill').style.width = xpPct + '%';
+    document.getElementById('xp-mini').style.width = xpPct + '%';
+    
     const ore = getCurrentOre();
     document.getElementById('ore-name').textContent = ore.icon + ' ' + ore.name;
     
-    // Статы
     document.getElementById('s-miners').textContent = Object.values(G.miners).reduce((a,b) => a+b, 0);
     document.getElementById('s-power').textContent = getClickPower();
     document.getElementById('s-auto').textContent = getAutoPower();
-    document.getElementById('s-pick').textContent = G.pickaxe.name;
+    document.getElementById('s-pick').textContent = G.pickaxe.name.substring(0, 8);
     
-    // Нефтяной блок
     const oilBlock = document.getElementById('oil-block');
     if (G.oilRigs > 0) {
         oilBlock.classList.remove('hidden');
@@ -316,11 +337,7 @@ function updateMineUI() {
     }
 }
 
-// ============ АВТО-ОБНОВЛЕНИЕ ============
-setInterval(() => {
-    updateMineUI();
-    checkActiveBoosts();
-}, 5000);
+setInterval(updateMineUI, 5000);
 </script>
 
 </body>
