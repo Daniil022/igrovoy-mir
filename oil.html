@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🛢 Нефть — Шахтёр-Мир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+    <header class="h">
+        <div class="h-res">
+            <span class="badge coin">🪙 <b id="coins">100</b></span>
+            <span class="badge oil">🛢 <b id="oil">0</b></span>
+        </div>
+        <div class="h-lvl">⭐ <b id="level">1</b></div>
+    </header>
+
+    <nav class="tabs">
+        <a href="index.html" class="tab-btn">⛏ Шахта</a>
+        <a href="miners.html" class="tab-btn">👷 Бригада</a>
+        <a href="shop.html" class="tab-btn">🛒 Магазин</a>
+        <a href="oil.html" class="tab-btn active">🛢 Нефть</a>
+        <a href="cases.html" class="tab-btn">📦 Кейсы</a>
+        <a href="achievements.html" class="tab-btn">🏆</a>
+    </nav>
+
+    <main class="main">
+        <h2>🛢 Нефтяной бизнес</h2>
+        <div class="oil-block">
+            <p>🏭 Вышек: <b id="rigs">0</b> | Мощность: <b id="rig-power">1</b>/с каждая</p>
+            <p>🛢 Бочек: <b id="barrels">0</b> | Хранилище: <b id="storage">50</b></p>
+            <p>⏱ Добыча: <b id="oil-rate">0</b>/с | Готово: <b id="oil-ready">0</b></p>
+        </div>
+        
+        <h3>🏭 Нефтяные вышки</h3>
+        <div class="grid">
+            <div class="card">
+                <div class="icon">🏭</div>
+                <div class="name">Нефтяная вышка</div>
+                <div class="desc">+1 нефти/сек</div>
+                <div class="price">🪙 <span id="rig-cost">200</span></div>
+                <button id="buy-rig">Купить</button>
+            </div>
+            <div class="card">
+                <div class="icon">⚙️</div>
+                <div class="name">Улучшить вышки</div>
+                <div class="desc">x2 мощность всех вышек</div>
+                <div class="price">🪙 <span id="upgrade-cost">1000</span></div>
+                <button id="upgrade-rig">Улучшить</button>
+            </div>
+        </div>
+
+        <h3>🛢 Обмен бочек</h3>
+        <div class="card" style="margin-top:1rem;">
+            <div class="icon">🛢🛢🛢🛢🛢🛢🛢🛢🛢🛢</div>
+            <div class="name">10 бочек</div>
+            <div class="desc">+100 к хранилищу нефти</div>
+            <div class="price">🪙 1 000 000</div>
+            <button id="exchange-barrels" ${G.coins<1e6?'disabled':''}>
+                Обменять (обменов: ${G.barrelExchanges})
+            </button>
+        </div>
+    </main>
+</div>
+
+<div id="toast" class="toast hidden">
+    <span id="toast-icon"></span>
+    <div><strong id="toast-title"></strong><p id="toast-text"></p></div>
+</div>
+
+<script src="script.js"></script>
+<script>
+function updateOilUI() {
+    document.getElementById('coins').textContent = fmt(G.coins);
+    document.getElementById('oil').textContent = fmt(G.ores.oil);
+    document.getElementById('level').textContent = G.level;
+    
+    document.getElementById('rigs').textContent = G.oilRigs;
+    document.getElementById('rig-power').textContent = G.oilRigPower;
+    document.getElementById('barrels').textContent = G.barrels;
+    document.getElementById('storage').textContent = 50 + G.barrels * 10 * G.barrelCapacity;
+    document.getElementById('oil-rate').textContent = getOilRate();
+    document.getElementById('oil-ready').textContent = fmt(G.oilStored);
+    document.getElementById('rig-cost').textContent = fmt(G.oilRigCost);
+    document.getElementById('upgrade-cost').textContent = fmt(G.oilRigs * 500 + 500);
+}
+
+document.getElementById('buy-rig').addEventListener('click', () => {
+    if (G.coins < G.oilRigCost) return;
+    G.coins -= G.oilRigCost;
+    G.oilRigs++;
+    G.oilRigCost = Math.floor(G.oilRigCost * 1.5);
+    Sound.dig();
+    checkAchievements();
+    updateOilUI();
+    saveGame();
+});
+
+document.getElementById('upgrade-rig').addEventListener('click', () => {
+    const cost = G.oilRigs * 500 + 500;
+    if (G.coins < cost || G.oilRigs === 0) return;
+    G.coins -= cost;
+    G.oilRigPower *= 2;
+    Sound.rare();
+    updateOilUI();
+    saveGame();
+});
+
+document.getElementById('exchange-barrels').addEventListener('click', () => {
+    if (G.coins < 1e6) return;
+    G.coins -= 1e6;
+    G.barrels += 10;
+    G.barrelExchanges++;
+    G.maxOilStorage = 50 + G.barrels * 10 * G.barrelCapacity;
+    Sound.achieve();
+    checkAchievements();
+    updateOilUI();
+    saveGame();
+    showToast('🛢','Обмен успешен!','+10 бочек');
+});
+
+updateOilUI();
+</script>
+</body>
+</html>
