@@ -1,243 +1,268 @@
+:root {
+    --bg: #0a0603;
+    --bg2: #140d08;
+    --card: #1a100a;
+    --border: #2d1a0d;
+    --gold: #f1c40f;
+    --gold2: #b8960f;
+    --red: #e74c3c;
+    --green: #27ae60;
+    --blue: #2980b9;
+    --purple: #8e44ad;
+    --oil: #2c3e50;
+    --text: #e0d6c8;
+    --text2: #a09080;
+    --radius: 12px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background: #1a1a0a;
-    color: #fff;
-    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+body.light {
+    --bg: #f5f0e8;
+    --bg2: #ede4d6;
+    --card: #fff;
+    --border: #d5c4a1;
+    --text: #3d2b1f;
+    --text2: #7a6855;
 }
 
 /* Загрузка */
-.loading-screen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(180deg, #2d1a00, #1a0f00);
+#loading {
+    position: fixed; inset: 0; z-index: 9999;
+    background: radial-gradient(ellipse at center, #2d1800 0%, #0a0500 100%);
     display: flex; align-items: center; justify-content: center;
-    z-index: 9999; transition: opacity 0.5s;
+    transition: opacity 0.5s;
 }
-.loading-screen.hidden { opacity: 0; pointer-events: none; }
-.loading-content { text-align: center; }
-.loading-content h1 {
-    font-size: 2.5rem; color: #f39c12; margin-bottom: 1.5rem;
-    text-shadow: 0 0 20px #f39c12;
+#loading.hidden { opacity: 0; pointer-events: none; }
+.load-box { text-align: center; }
+.load-icon { font-size: 5rem; animation: float 2s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-25px)} }
+.load-box h1 {
+    font-size: 2.2rem;
+    background: linear-gradient(45deg, var(--gold), #ff6b00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0.5rem 0;
 }
-.loading-bar {
-    width: 280px; height: 10px; background: #333;
-    border-radius: 10px; margin: 0 auto 1rem auto; overflow: hidden;
+.load-bar {
+    width: 250px; height: 8px; background: #333;
+    border-radius: 4px; margin: 1rem auto; overflow: hidden;
 }
-.loading-progress {
-    height: 100%; background: linear-gradient(90deg, #f39c12, #e74c3c);
-    border-radius: 10px; animation: loadBar 2s forwards;
+.load-fill {
+    height: 100%; background: linear-gradient(90deg, var(--gold), var(--red));
+    border-radius: 4px; animation: loadAnim 2s forwards;
 }
-@keyframes loadBar { from { width: 0%; } to { width: 100%; } }
+@keyframes loadAnim { from{width:0} to{width:100%} }
+#load-tip { color: var(--text2); font-size: 0.85rem; margin-top: 0.5rem; }
 
-/* Контейнер игры */
-.game-container { display: flex; flex-direction: column; min-height: 100vh; }
-.game-container.hidden { display: none; }
+/* Приложение */
+#app.hidden { display: none; }
 
-/* Верхняя панель */
-.top-bar {
+/* Хедер */
+.h {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 0.6rem 1rem; background: #1a0f00; border-bottom: 2px solid #3d2000;
-    flex-wrap: wrap; gap: 0.5rem; position: sticky; top: 0; z-index: 100;
+    padding: 0.6rem 0.8rem; background: var(--bg2);
+    border-bottom: 1px solid var(--border); position: sticky; top: 0;
+    z-index: 100; gap: 0.3rem;
 }
-.resources { display: flex; gap: 0.8rem; flex-wrap: wrap; }
-.res-item {
-    font-size: 0.9rem; font-weight: bold;
-    padding: 0.3rem 0.6rem; border-radius: 12px; background: #2a1800;
+.h-res { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.badge {
+    font-size: 0.7rem; font-weight: bold; padding: 0.25rem 0.5rem;
+    border-radius: 10px; background: var(--card); border: 1px solid var(--border);
 }
-.res-item.coins { background: #3d2b00; color: #f1c40f; }
-.res-item.oil { background: #1a1a1a; color: #888; }
-.level-info { color: #f39c12; font-weight: bold; font-size: 0.95rem; }
+.badge.coin { color: var(--gold); }
+.badge.dia { color: #00bcd4; }
+.badge.oil { color: #7f8c8d; }
+.badge.en { color: #f39c12; }
+.h-lvl { text-align: center; font-size: 0.8rem; }
+.xp-mini { width: 50px; height: 3px; background: #333; border-radius: 2px; margin-top: 2px; }
+.xp-mini-fill { height: 100%; background: var(--gold); border-radius: 2px; width: 0%; transition: width 0.3s; }
 
-/* Основная область */
-.main-area { flex: 1; padding: 1rem; max-width: 700px; margin: 0 auto; width: 100%; }
-.view { display: none; }
-.view.active { display: block; }
+/* Табы */
+.tabs {
+    display: flex; background: var(--bg2); border-bottom: 1px solid var(--border);
+    position: sticky; top: 48px; z-index: 99; overflow-x: auto;
+}
+.tab-btn {
+    flex: 1; min-width: 44px; padding: 0.6rem 0.3rem; background: transparent;
+    border: none; color: var(--text2); font-size: 1rem; cursor: pointer;
+    transition: all 0.2s; border-bottom: 2px solid transparent;
+}
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); background: var(--card); }
+
+/* Контент */
+.main { padding: 0.8rem; max-width: 600px; margin: 0 auto; }
+.tab { display: none; }
+.tab.active { display: block; }
+h2 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--gold); }
 
 /* Шахта */
-.mine-scene { text-align: center; }
-.mine-cartoon {
-    position: relative; height: 120px; margin-bottom: 0.5rem;
+.shaft {
+    height: 180px; background: linear-gradient(180deg, #2d1800 0%, #0a0500 100%);
+    border-radius: var(--radius); margin-bottom: 0.8rem; position: relative;
+    border: 2px solid var(--border); overflow: hidden;
 }
-.miner-icon {
-    font-size: 4rem; position: absolute; left: 50%; bottom: 10px;
-    transform: translateX(-50%); animation: minerBounce 0.6s infinite alternate;
-    cursor: pointer; user-select: none;
+.miner {
+    font-size: 3.5rem; position: absolute; bottom: 15px; left: 50%;
+    transform: translateX(-50%); animation: minerAnim 0.8s infinite alternate;
+    cursor: pointer; z-index: 2;
 }
-.miner-icon:active { animation: minerHit 0.1s; }
-@keyframes minerBounce {
-    from { bottom: 10px; }
-    to { bottom: 25px; }
-}
-@keyframes minerHit {
-    0% { transform: translateX(-50%) rotate(0); }
-    50% { transform: translateX(-50%) rotate(-30deg); }
-    100% { transform: translateX(-50%) rotate(0); }
-}
-.oil-pump {
-    font-size: 2.5rem; position: absolute; right: 20%; bottom: 10px;
-    animation: pumpMove 2s infinite;
-}
-@keyframes pumpMove {
-    0%, 100% { bottom: 10px; }
-    50% { bottom: 20px; }
-}
+@keyframes minerAnim { from{bottom:15px} to{bottom:28px} }
+.miner:active { animation: minerHit 0.15s; }
+@keyframes minerHit { 0%{transform:translateX(-50%) rotate(0)} 50%{transform:translateX(-50%) rotate(-35deg) scale(1.1)} 100%{transform:translateX(-50%) rotate(0)} }
 .ore-pop {
-    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-    font-size: 1.5rem; opacity: 0; transition: all 0.3s;
+    position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    font-size: 1.8rem; pointer-events: none; opacity: 0; transition: all 0.4s;
 }
-.ore-pop.show { opacity: 1; top: -20px; }
+.ore-pop.show { opacity: 1; top: -15px; }
 
-/* Кнопка копать */
-.mine-btn {
+/* Кнопки */
+.dig {
+    display: block; width: 90%; max-width: 320px; margin: 0 auto; padding: 1rem;
+    font-size: 1.3rem; font-weight: bold;
     background: linear-gradient(180deg, #8B4513, #5C2E00);
-    color: #f39c12; border: 3px solid #f39c12; padding: 1.2rem 3rem;
-    font-size: 1.5rem; font-weight: bold; border-radius: 20px;
-    cursor: pointer; margin: 0.5rem 0; transition: all 0.1s;
-    text-shadow: 0 0 10px #f39c12; box-shadow: 0 0 20px rgba(243,156,18,0.3);
+    color: var(--gold); border: 3px solid var(--gold);
+    border-radius: 25px; cursor: pointer;
+    box-shadow: 0 0 20px rgba(241,196,15,0.2);
+    transition: all 0.1s;
 }
-.mine-btn:active { transform: scale(0.95); background: #3d1a00; }
+.dig:active { transform: scale(0.95); background: #3d1a00; }
 
-/* Прогресс */
-.progress-bar {
-    width: 80%; height: 20px; background: #2a1800; border-radius: 10px;
-    margin: 0.8rem auto; overflow: hidden; border: 2px solid #3d2000;
+.xp-bar {
+    width: 90%; max-width: 320px; height: 12px; background: #1a0f00;
+    border-radius: 6px; margin: 0.6rem auto; border: 1px solid var(--border);
+    overflow: hidden;
 }
-.progress-fill {
-    height: 100%; background: linear-gradient(90deg, #f39c12, #e74c3c);
-    border-radius: 10px; transition: width 0.1s; width: 0%;
+.xp-fill {
+    height: 100%; background: linear-gradient(90deg, #ff6b00, var(--gold));
+    border-radius: 6px; width: 0%; transition: width 0.2s;
 }
-#current-ore-text { color: #ccc; font-size: 0.9rem; }
 
-/* Статистика */
-.stats-row {
-    display: flex; justify-content: center; gap: 1.5rem;
-    flex-wrap: wrap; margin: 0.8rem 0; font-size: 0.9rem;
-}
-.stats-row b { color: #f39c12; }
+#ore-name { text-align: center; font-size: 0.9rem; margin-bottom: 0.5rem; }
 
-/* Нефтянка */
-.oil-section {
-    background: #1a1a1a; border: 2px solid #333; border-radius: 15px;
-    padding: 1rem; margin: 1rem 0;
+/* Статы */
+.stats {
+    display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+    margin: 0.8rem 0; font-size: 0.85rem;
 }
-.oil-section h3 { color: #888; margin-bottom: 0.5rem; }
+.stats b { color: var(--gold); }
 
-.oil-btn {
-    background: #222; color: #888; border: 2px solid #444;
-    padding: 0.7rem 1.5rem; border-radius: 20px; cursor: pointer;
-    margin-top: 0.5rem; font-size: 0.95rem; transition: all 0.3s;
+/* Кнопки */
+.btn {
+    display: block; width: 90%; max-width: 320px; margin: 0.4rem auto; padding: 0.7rem;
+    border: none; border-radius: var(--radius); cursor: pointer;
+    font-size: 0.95rem; font-weight: bold; transition: all 0.2s;
 }
-.oil-btn:hover { border-color: #888; color: #fff; }
+.btn-sell { background: var(--green); color: #fff; }
+.btn-boost { background: #e67e22; color: #fff; }
+.btn-prestige { background: var(--purple); color: #fff; }
+.btn-daily { background: var(--blue); color: #fff; }
+.btn:active { transform: scale(0.96); }
 
-/* Кнопка продажи */
-.sell-btn {
-    background: linear-gradient(180deg, #f1c40f, #d4a017);
-    color: #1a0f00; border: none; padding: 1rem 2rem;
-    font-size: 1.2rem; font-weight: bold; border-radius: 25px;
-    cursor: pointer; margin-top: 0.8rem; width: 90%; max-width: 400px;
-    transition: transform 0.1s;
+/* Сетка */
+.grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.7rem;
 }
-.sell-btn:active { transform: scale(0.95); }
-
-/* Магазин */
-.shop-tabs { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 1rem; }
-.stab {
-    background: #2a1800; color: #888; border: 1px solid #3d2000;
-    padding: 0.5rem 0.8rem; border-radius: 15px; cursor: pointer;
-    font-size: 0.8rem; transition: all 0.3s;
+.card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.8rem; text-align: center;
+    transition: all 0.2s;
 }
-.stab.active, .stab:hover { background: #3d2000; color: #f39c12; border-color: #f39c12; }
-.shop-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.8rem;
+.card:hover { border-color: var(--gold); }
+.card .icon { font-size: 2rem; margin-bottom: 0.3rem; }
+.card .name { font-weight: bold; font-size: 0.9rem; }
+.card .desc { font-size: 0.7rem; color: var(--text2); margin: 0.3rem 0; }
+.card .price { font-weight: bold; color: var(--gold); margin: 0.4rem 0; font-size: 0.85rem; }
+.card button {
+    width: 100%; padding: 0.5rem; background: var(--gold2); color: #1a0f00;
+    border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
+    font-size: 0.8rem;
 }
-.shop-card {
-    background: #2a1800; border: 2px solid #3d2000; border-radius: 12px;
-    padding: 1rem; text-align: center; transition: border-color 0.3s;
-}
-.shop-card:hover { border-color: #f39c12; }
-.shop-card .card-icon { font-size: 2.5rem; margin-bottom: 0.3rem; }
-.shop-card h4 { font-size: 0.9rem; margin-bottom: 0.3rem; }
-.shop-card .card-desc { font-size: 0.75rem; color: #888; margin-bottom: 0.5rem; }
-.shop-card .card-price { font-weight: bold; color: #f1c40f; margin-bottom: 0.5rem; }
-.shop-card button {
-    background: #f39c12; color: #1a0f00; border: none; padding: 0.5rem 1rem;
-    border-radius: 15px; cursor: pointer; font-weight: bold; width: 100%;
-}
-.shop-card button:disabled { background: #555; color: #999; cursor: not-allowed; }
-
-/* Инвентарь */
-.inv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.8rem; }
-.inv-item {
-    background: #2a1800; border: 1px solid #3d2000; border-radius: 10px;
-    padding: 0.8rem; text-align: center;
-}
-.inv-item .inv-icon { font-size: 2rem; }
-
-/* Достижения */
-#achievements-content { display: grid; gap: 0.8rem; }
-.achieve-card {
-    background: #2a1800; border: 2px solid #3d2000; border-radius: 12px;
-    padding: 1rem; display: flex; align-items: center; gap: 1rem;
-}
-.achieve-card.done { border-color: #f39c12; }
-.achieve-card.locked { opacity: 0.5; }
-.achieve-card .ach-icon { font-size: 2rem; }
-
-/* Нижняя панель */
-.bottom-bar {
-    display: flex; justify-content: space-around; padding: 0.6rem;
-    background: #1a0f00; border-top: 2px solid #3d2000;
-    position: sticky; bottom: 0;
-}
-.nav-btn {
-    background: transparent; color: #888; border: none;
-    padding: 0.5rem 0.8rem; border-radius: 10px; cursor: pointer;
-    font-size: 0.85rem; transition: all 0.3s;
-}
-.nav-btn:hover, .nav-btn.active { background: #2a1800; color: #f39c12; }
+.card button:disabled { background: #555; color: #999; cursor: not-allowed; }
 
 /* Модалки */
 .modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); display: flex; align-items: center;
-    justify-content: center; z-index: 1000;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
 }
 .modal.hidden { display: none; }
-.modal-content {
-    background: #2a1800; padding: 2rem; border-radius: 20px;
-    text-align: center; border: 2px solid #f39c12; max-width: 400px; width: 90%;
+.modal-box {
+    background: var(--card); padding: 2rem; border-radius: 20px;
+    text-align: center; border: 2px solid var(--gold); max-width: 320px; width: 90%;
 }
-.case-open h2 { color: #f39c12; margin-bottom: 1rem; }
-#case-result { font-size: 1.5rem; margin: 1rem 0; min-height: 60px; }
-.action-btn {
-    background: #f39c12; color: #1a0f00; border: none; padding: 0.8rem 2rem;
-    border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 1rem;
+.modal-box button {
+    padding: 0.7rem 1.5rem; background: var(--gold); color: #1a0f00;
+    border: none; border-radius: 15px; cursor: pointer; font-weight: bold;
+    font-size: 1rem; margin-top: 1rem;
 }
 
-/* Попап ачивки */
-.achieve-popup {
-    position: fixed; top: 80px; right: 20px; z-index: 999;
+/* Тосты */
+.toast {
+    position: fixed; top: 60px; right: 10px; z-index: 999;
+    background: var(--card); border: 2px solid var(--gold); border-radius: 15px;
+    padding: 0.8rem; display: flex; align-items: center; gap: 0.6rem;
+    box-shadow: 0 0 20px rgba(241,196,15,0.4);
     animation: slideIn 0.5s ease;
+    max-width: 280px;
 }
-.achieve-popup.hidden { display: none; }
-.achieve-popup-content {
-    background: #2a1800; border: 2px solid #f39c12; border-radius: 15px;
-    padding: 1rem; display: flex; align-items: center; gap: 0.8rem;
-    box-shadow: 0 0 20px rgba(243,156,18,0.5);
-}
-.achieve-icon { font-size: 2rem; }
-.achieve-popup-content strong { color: #f39c12; }
+.toast.hidden { display: none; }
+#toast-icon { font-size: 1.8rem; }
+#toast-title { font-weight: bold; color: var(--gold); font-size: 0.9rem; }
+#toast-text { font-size: 0.75rem; color: var(--text2); }
 @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from{transform:translateX(120%);opacity:0}
+    to{transform:translateX(0);opacity:1}
 }
 
-@media (max-width: 480px) {
-    .mine-btn { padding: 1rem 2rem; font-size: 1.2rem; }
-    .resources { gap: 0.3rem; }
-    .res-item { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
-    .stats-row { gap: 0.8rem; font-size: 0.8rem; }
+/* Буст-индикатор */
+.boost {
+    position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+    background: #e74c3c; color: #fff; padding: 0.5rem 1.5rem;
+    border-radius: 20px; font-weight: bold; z-index: 200;
+    animation: pulse 0.5s infinite;
 }
+.boost.hidden { display: none; }
+@keyframes pulse {
+    0%,100%{box-shadow:0 0 10px #e74c3c}
+    50%{box-shadow:0 0 30px #e74c3c}
+}
+
+/* Нефтяной блок */
+.oil-block {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0.8rem; margin: 0.8rem 0;
+}
+.oil-block.hidden { display: none; }
+.oil-block h3 { color: var(--oil); font-size: 1rem; margin-bottom: 0.5rem; }
+
+/* Адаптив */
+@media (max-width: 380px) {
+    .h { padding: 0.4rem 0.5rem; }
+    .badge { font-size: 0.65rem; padding: 0.2rem 0.4rem; }
+    .tabs { top: 40px; }
+    .tab-btn { font-size: 0.8rem; padding: 0.5rem 0.2rem; }
+    .grid { grid-template-columns: 1fr 1fr; }
+    .dig { font-size: 1.1rem; padding: 0.8rem; }
+    h2 { font-size: 1.1rem; }
+}
+
+/* Светлая тема */
+body.light .shaft { background: linear-gradient(180deg, #d4c4a8 0%, #b8a080 100%); }
+body.light .card { background: #fff; }
+body.light .dig { background: linear-gradient(180deg, #a0522d, #6b3a1f); }
