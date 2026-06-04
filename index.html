@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0d1117">
     <title>VR HOUSE • Панель сотрудника</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background: #0d1117; color: #e6edf3; display: flex; min-height: 100vh; }
@@ -72,6 +70,7 @@
         .vr-game-actions { display: flex; gap: 8px; }
         .empty-games { color: #8b949e; font-size: 13px; text-align: center; padding: 20px; font-style: italic; }
         .add-game-form { display: flex; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #30363d; }
+        .add-game-form input { flex: 1; padding: 8px 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; color: #e6edf3; outline: none; }
         .add-game-form button { flex-shrink: 0; }
 
         /* Задачи */
@@ -104,7 +103,7 @@
         .moves-grid, .issues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 28px; }
         .move-card, .issue-card { background: #1c2128; border: 1px solid #30363d; border-radius: 12px; padding: 16px; transition: 0.2s; cursor: pointer; }
         .move-card:hover, .issue-card:hover { border-color: #a855f7; transform: translateY(-2px); }
-        .move-card-header, .issue-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .move-card-header, .issue-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .move-card-id { color: #a855f7; font-size: 12px; font-weight: 600; }
         .issue-card-id { color: #f85149; font-size: 12px; font-weight: 600; }
         .move-card-status { font-size: 10px; padding: 4px 8px; border-radius: 20px; background: rgba(63,185,80,0.2); color: #3fb950; }
@@ -122,6 +121,35 @@
         .priority-low-card { background: rgba(63,185,80,0.2); color: #3fb950; }
         .issue-card-image { max-width: 100%; max-height: 100px; border-radius: 8px; cursor: pointer; margin-top: 8px; }
         .empty-moves, .empty-issues { text-align: center; padding: 40px; color: #8b949e; background: #1c2128; border-radius: 12px; }
+
+        .shift-block { background: #1c2128; border: 2px solid #3fb950; border-radius: 16px; padding: 28px; text-align: center; margin-bottom: 24px; }
+        .shift-block.inactive { border-color: #30363d; }
+
+        .table-wrap { background: #1c2128; border: 1px solid #30363d; border-radius: 10px; overflow-x: auto; margin-bottom: 28px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 18px; font-size: 11px; color: #8b949e; border-bottom: 1px solid #30363d; }
+        td { padding: 12px 18px; font-size: 13px; border-bottom: 1px solid #1a1f26; }
+
+        /* Календарь */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 24px; }
+        .calendar-day-header { text-align: center; padding: 10px; font-size: 12px; color: #8b949e; font-weight: 600; }
+        .calendar-day { background: #1c2128; border: 1px solid #30363d; border-radius: 8px; min-height: 80px; padding: 8px; cursor: pointer; transition: 0.2s; }
+        .calendar-day:hover { background: #2d333b; }
+        .calendar-day.empty { background: transparent; border-color: transparent; cursor: default; }
+        .calendar-day.today { border-color: #a855f7; background: rgba(168,85,247,0.1); }
+        .calendar-day.has-shifts { border-color: #3fb950; }
+        .calendar-day-number { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .calendar-shift-count { font-size: 10px; color: #3fb950; }
+        .calendar-shift-list { font-size: 10px; color: #8b949e; margin-top: 4px; }
+        .calendar-shift-list span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Мульти-выбор оборудования */
+        .equipment-selector { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 8px; max-height: 250px; overflow-y: auto; margin-bottom: 12px; }
+        .equipment-item { display: flex; align-items: center; gap: 10px; padding: 8px; cursor: pointer; border-radius: 6px; transition: 0.1s; }
+        .equipment-item:hover { background: #1c2128; }
+        .equipment-item input { width: 18px; height: 18px; cursor: pointer; accent-color: #a855f7; }
+        .equipment-item.disabled { opacity: 0.4; cursor: not-allowed; }
+        .selected-count { font-size: 12px; color: #3fb950; margin-top: 8px; text-align: right; }
 
         /* Цвета должностей */
         .role-director { background: rgba(168,85,247,0.2); color: #a855f7; border-left: 3px solid #a855f7; }
@@ -153,26 +181,6 @@
         .profile-field label { display: block; font-size: 11px; color: #8b949e; margin-bottom: 4px; text-transform: uppercase; }
         .profile-field input { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; color: #fff; }
 
-        .shift-block { background: #1c2128; border: 2px solid #3fb950; border-radius: 16px; padding: 28px; text-align: center; margin-bottom: 24px; }
-        .shift-block.inactive { border-color: #30363d; }
-
-        .table-wrap { background: #1c2128; border: 1px solid #30363d; border-radius: 10px; overflow-x: auto; margin-bottom: 28px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px 18px; font-size: 11px; color: #8b949e; border-bottom: 1px solid #30363d; }
-        td { padding: 12px 18px; font-size: 13px; border-bottom: 1px solid #1a1f26; }
-
-        /* Календарь */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 24px; }
-        .calendar-day-header { text-align: center; padding: 10px; font-size: 12px; color: #8b949e; font-weight: 600; }
-        .calendar-day { background: #1c2128; border: 1px solid #30363d; border-radius: 8px; min-height: 80px; padding: 8px; cursor: pointer; transition: 0.2s; }
-        .calendar-day:hover { background: #2d333b; }
-        .calendar-day.empty { background: transparent; border-color: transparent; cursor: default; }
-        .calendar-day.today { border-color: #a855f7; background: rgba(168,85,247,0.1); }
-        .calendar-day.has-shifts { border-color: #3fb950; }
-        .calendar-day-number { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-        .calendar-shift-count { font-size: 10px; color: #3fb950; }
-        .calendar-shift-list { font-size: 10px; color: #8b949e; margin-top: 4px; }
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; }
         .modal { background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 24px; width: 550px; max-width: 90vw; max-height: 85vh; overflow-y: auto; }
         .modal h3 { margin-bottom: 16px; font-size: 18px; }
@@ -181,20 +189,18 @@
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; color: #e6edf3; font-size: 14px; outline: none; }
         .date-row { display: flex; gap: 12px; }
         .date-row .form-group { flex: 1; }
-        .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+        .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
         .hidden { display: none !important; }
 
         .toast { position: fixed; bottom: 24px; right: 24px; background: #1c2128; border: 1px solid #3fb950; border-radius: 10px; padding: 12px 20px; z-index: 999; animation: slideUp 0.3s; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Лицензия */
         .license-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; }
         .license-card { background: #161b22; border: 1px solid #30363d; border-radius: 20px; padding: 40px; width: 450px; text-align: center; }
         .license-card input { width: 100%; padding: 12px; margin: 15px 0; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; color: #fff; font-size: 16px; text-align: center; }
         .license-key-display { background: #0d1117; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 18px; letter-spacing: 2px; margin: 15px 0; border: 1px solid #a855f7; }
         .device-id-display { font-size: 10px; color: #8b949e; margin-top: 15px; word-break: break-all; }
 
-        /* Авторизация */
         .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1500; display: flex; align-items: center; justify-content: center; }
 
         @media (max-width: 768px) {
@@ -210,21 +216,21 @@
         <div class="license-card">
             <i class="fas fa-vr-cardboard" style="font-size: 64px; color: #a855f7; margin-bottom: 20px;"></i>
             <h2 style="margin-bottom: 10px;">VR HOUSE</h2>
-            <p style="color: #8b949e; margin-bottom: 15px; font-size: 13px;">Активация лицензии</p>
+            <p style="color: #8b949e; margin-bottom: 15px;">Активация лицензии</p>
             <div id="licenseKeyDisplay" class="license-key-display"></div>
             <input type="text" id="licenseKeyInput" placeholder="Введите лицензионный ключ">
-            <div id="licenseError" style="color:#f85149; font-size:12px; margin:10px 0; display:none;"></div>
+            <div id="licenseError" style="color:#f85149; display:none;"></div>
             <button class="btn btn-purple" style="width:100%;" onclick="checkLicense()">Активировать</button>
             <div id="deviceIdDisplay" class="device-id-display"></div>
-            <p style="color:#8b949e; font-size:10px; margin-top:15px;">© 2025 VR House. Все права защищены.</p>
+            <p style="color:#8b949e; font-size:10px; margin-top:15px;">© 2025 VR House</p>
         </div>
     </div>
 
     <aside class="sidebar" id="sidebar" style="display:none;"></aside>
     <main class="main" id="mainContent" style="display:none;"></main>
 
-    <!-- Модальные окна (все из твоего рабочего кода) -->
-    <div class="modal-overlay hidden" id="modalPassword"><div class="modal"><h3><i class="fas fa-lock"></i> Введите пароль</h3><input type="password" id="passwordInput" placeholder="Пароль"><div id="passwordError" class="hidden">Неверный пароль!</div><div class="btn-row"><button class="btn btn-outline" id="btnCancelPassword">Отмена</button><button class="btn btn-purple" id="btnSubmitPassword">Подтвердить</button></div></div></div>
+    <!-- Модальные окна -->
+    <div class="modal-overlay hidden" id="modalPassword"><div class="modal"><h3>Введите пароль</h3><input type="password" id="passwordInput" placeholder="Пароль"><div id="passwordError" class="hidden">Неверный пароль!</div><div class="btn-row"><button class="btn btn-outline" id="btnCancelPassword">Отмена</button><button class="btn btn-purple" id="btnSubmitPassword">Подтвердить</button></div></div></div>
     <div class="modal-overlay hidden" id="modalTask"><div class="modal"><h3>Новая задача</h3><div class="form-group"><label>Название</label><input type="text" id="taskTitle"></div><div class="form-group"><label>Описание</label><textarea id="taskDesc" rows="3"></textarea></div><div class="date-row"><div class="form-group"><label>Дата начала</label><input type="date" id="taskDateFrom"></div><div class="form-group"><label>Дата окончания</label><input type="date" id="taskDateTo"></div></div><div class="form-group"><label>Исполнитель</label><select id="taskAssignee"><option>Паша</option><option>Таня</option><option>Нура</option><option>Юра</option><option>Константин</option><option>Артём</option><option>Никита</option><option>Даниил</option></select></div><div class="form-group"><label>Важность</label><select id="taskPriority"><option value="high">Высокая</option><option value="medium">Средняя</option><option value="low">Низкая</option></select></div><div class="btn-row"><button class="btn btn-outline" id="btnCancelTask">Отмена</button><button class="btn btn-purple" id="btnSubmitTask">Создать</button></div></div></div>
     <div class="modal-overlay hidden" id="modalAddGame"><div class="modal"><h3>Добавить игру</h3><div class="form-group"><label>Название</label><input type="text" id="newGameName"></div><div class="form-group"><label>Описание</label><textarea id="newGameDesc" rows="2"></textarea></div><div class="btn-row"><button class="btn btn-outline" id="btnCancelGame">Отмена</button><button class="btn btn-purple" id="btnSubmitGame">Добавить</button></div></div></div>
     <div class="modal-overlay hidden" id="modalRejectReason"><div class="modal"><h3>Причина невыполнения</h3><textarea id="rejectReason" rows="4"></textarea><div class="btn-row"><button class="btn btn-outline" id="btnCancelReject">Отмена</button><button class="btn btn-red" id="btnSubmitReject">Подтвердить</button></div></div></div>
@@ -232,13 +238,13 @@
     <div class="modal-overlay hidden" id="modalImageView"><div class="modal" style="text-align:center;"><img id="fullImage" src=""><div class="btn-row"><button class="btn btn-outline" id="btnCloseImage">Закрыть</button></div></div></div>
     <div class="modal-overlay hidden" id="modalShiftStart"><div class="modal"><h3>Приход на смену</h3><input type="text" id="inputStaffName" placeholder="Ваше имя"><p>💰 100 ₽/час</p><div class="btn-row"><button class="btn btn-outline" id="btnCancelShift">Отмена</button><button class="btn btn-purple" id="btnStartShift">Начать</button></div></div></div>
     <div class="modal-overlay hidden" id="modalShiftEnd"><div class="modal"><h3>Завершение смены</h3><div id="shiftEndInfo"></div><div class="btn-row"><button class="btn btn-outline" id="btnCancelShiftEnd">Отмена</button><button class="btn btn-red" id="btnConfirmShiftEnd">Завершить</button></div></div></div>
-    <div class="modal-overlay hidden" id="modalMoveEquipment"><div class="modal"><h3>Перемещение</h3><div class="form-group"><label>Оборудование</label><select id="selectMoveEquipment"></select></div><div class="form-group"><label>Категория</label><select id="selectMoveCategory"><option value="park">Парк</option><option value="event">Мероприятие</option><option value="repair">Ремонт</option><option value="staff">Сотрудник</option></select></div><div class="form-group"><label>Описание</label><textarea id="inputMoveDesc" rows="2"></textarea></div><div class="form-group"><label>Кто взял</label><input type="text" id="inputMoveStaffName"></div><div class="form-group"><label>Телефон</label><input type="text" id="inputMovePhone"></div><div class="btn-row"><button class="btn btn-outline" id="btnCancelMove">Отмена</button><button class="btn btn-blue" id="btnSubmitMove">Зафиксировать</button></div></div></div>
+    <div class="modal-overlay hidden" id="modalMoveEquipment"><div class="modal"><h3>Перемещение</h3><div class="form-group"><label>Выберите оборудование</label><div id="equipmentSelector" class="equipment-selector"></div><div id="selectedCount" class="selected-count">Выбрано: 0</div></div><div class="form-group"><label>Категория</label><select id="selectMoveCategory"><option value="park">Парк</option><option value="event">Мероприятие</option><option value="repair">Ремонт</option><option value="staff">Сотрудник</option></select></div><div class="form-group"><label>Описание</label><textarea id="inputMoveDesc" rows="2"></textarea></div><div class="form-group"><label>Кто взял</label><input type="text" id="inputMoveStaffName"></div><div class="form-group"><label>Телефон</label><input type="text" id="inputMovePhone"></div><div class="btn-row"><button class="btn btn-outline" id="btnCancelMove">Отмена</button><button class="btn btn-blue" id="btnSubmitMove">Зафиксировать</button></div></div></div>
     <div class="modal-overlay hidden" id="modalAddEmployee"><div class="modal"><h3>Добавить сотрудника</h3><div class="form-group"><label>Имя</label><input type="text" id="empName"></div><div class="form-group"><label>Телефон</label><input type="text" id="empPhone"></div><div class="form-group"><label>Telegram</label><input type="text" id="empTg"></div><div class="form-group"><label>Должность</label><select id="empRole"><option value="director">Директор</option><option value="manager">Управляющий</option><option value="tech">Техник/Сис.Админ</option><option value="admin">Администратор</option><option value="operator">Оператор</option></select></div><div class="form-group"><label>Пароль</label><input type="text" id="empPassword" value="1234"></div><div class="btn-row"><button class="btn btn-outline" id="btnCancelEmp">Отмена</button><button class="btn btn-purple" id="btnSubmitEmp">Добавить</button></div></div></div>
     <div class="modal-overlay hidden" id="modalChangePassword"><div class="modal"><h3>Смена пароля</h3><div class="form-group"><label>Текущий пароль</label><input type="password" id="oldPass"></div><div class="form-group"><label>Новый пароль</label><input type="password" id="newPass1"></div><div class="form-group"><label>Подтверждение</label><input type="password" id="newPass2"></div><div class="btn-row"><button class="btn btn-outline" id="btnCancelPass">Отмена</button><button class="btn btn-purple" id="btnSubmitPass">Сменить пароль</button></div></div></div>
 
     <script>
-        // ============ ЛИЦЕНЗИОННАЯ ЗАЩИТА ============
-        const STORAGE_KEY = 'vrhouse_data_v18';
+        // ============ ЛИЦЕНЗИЯ И АВТОРИЗАЦИЯ ============
+        const STORAGE_KEY = 'vrhouse_data_v20';
         const LICENSES = ['VRH-2025-ADMIN-001', 'VRH-DEMO-2025-001', 'VRH-TEST-2025-001'];
         let currentUser = null;
         let currentTab = 'dashboard';
@@ -286,8 +292,7 @@
                 showLoginScreen();
             }
         });
-
-        // ============ АВТОРИЗАЦИЯ ============
+        
         function showLoginScreen() {
             const loginDiv = document.createElement('div');
             loginDiv.id = 'loginScreenDiv';
@@ -334,19 +339,19 @@
         const PROTECTED_TABS = ['shift', 'calendar_history'];
         
         const SALARY_COMPONENTS = [
-            { name: 'Оклад', type: 'fixed', default: 50000, unit: '₽' },
-            { name: 'Почасовая ставка', type: 'hourly', default: 100, unit: '₽/час' },
-            { name: 'Бонус за смену', type: 'per_shift', default: 50, unit: '₽/смена' },
-            { name: 'Бонус за задачу', type: 'per_task', default: 20, unit: '₽/задача' },
-            { name: 'Премия за KPI', type: 'kpi', default: 5000, unit: '₽' },
-            { name: 'Районный коэффициент', type: 'percent', default: 15, unit: '%' },
-            { name: 'Выслуга лет', type: 'percent', default: 5, unit: '%' },
-            { name: 'Ночные смены', type: 'extra', default: 200, unit: '₽/ночь' },
-            { name: 'Сверхурочные', type: 'overtime', default: 150, unit: '₽/час' },
-            { name: 'Проектная премия', type: 'project', default: 3000, unit: '₽' }
+            { name: 'Оклад', default: 50000, unit: '₽' },
+            { name: 'Почасовая ставка', default: 100, unit: '₽/час' },
+            { name: 'Бонус за смену', default: 50, unit: '₽/смена' },
+            { name: 'Бонус за задачу', default: 20, unit: '₽/задача' },
+            { name: 'Премия за KPI', default: 5000, unit: '₽' },
+            { name: 'Районный коэффициент', default: 15, unit: '%' },
+            { name: 'Выслуга лет', default: 5, unit: '%' },
+            { name: 'Ночные смены', default: 200, unit: '₽/ночь' },
+            { name: 'Сверхурочные', default: 150, unit: '₽/час' },
+            { name: 'Проектная премия', default: 3000, unit: '₽' }
         ];
 
-        // ============ ДАННЫЕ (из твоего рабочего кода) ============
+        // ============ ДАННЫЕ ============
         let Categories = {};
         let Issues = { list: [], nextId: 1 };
         let Shift = { active: false, staffName: '', startTime: null };
@@ -405,8 +410,10 @@
                     Tasks = data.tasks || [];
                     Users = data.users || Users;
                     UserSalarySettings = data.userSalarySettings || {};
+                    if (Categories.helmets) {
+                        Categories.helmets.forEach(h => { if (!h.games) h.games = []; });
+                    }
                     CATEGORY_DEFS.forEach(c => { if (!Categories[c.id]) Categories[c.id] = []; });
-                    if (Categories.helmets) Categories.helmets.forEach(h => { if (!h.games) h.games = []; });
                     if (Object.values(Categories).flat().length === 0) initCategories();
                 } catch(e) { initCategories(); }
             } else { initCategories(); }
@@ -431,21 +438,20 @@
         function closeModal(id) { const modal = document.getElementById(id); if (modal) modal.classList.add('hidden'); }
         function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
 
-        // ============ ВСЕ ТВОИ ФУНКЦИИ (VR-ИГРЫ, ЗАДАЧИ, ПЕРЕМЕЩЕНИЯ, ПРОБЛЕМЫ, СМЕНЫ, КАЛЕНДАРЬ) ============
-        // VR-ИГРЫ
+        // ============ VR-ИГРЫ ============
         function openAddGameModal(helmetId) { currentHelmetForGame = helmetId; document.getElementById('newGameName').value = ''; document.getElementById('newGameDesc').value = ''; openModal('modalAddGame'); }
         function addGameToHelmet() { const name = document.getElementById('newGameName').value.trim(); if (!name) return showToast('Введите название'); const helmet = findEquip(currentHelmetForGame); if (helmet) { const newId = helmet.games.length ? Math.max(...helmet.games.map(g => g.id)) + 1 : 1; helmet.games.push({ id: newId, name: name, desc: document.getElementById('newGameDesc').value }); saveData(); renderVRGames(); showToast(`✅ Игра добавлена`); } closeModal('modalAddGame'); }
         function removeGameFromHelmet(helmetId, gameId) { const helmet = findEquip(helmetId); if (helmet) { helmet.games = helmet.games.filter(g => g.id !== gameId); saveData(); renderVRGames(); showToast(`❌ Игра удалена`); } }
         function renderVRGames() { const helmets = Categories.helmets || []; const totalGames = helmets.reduce((s, h) => s + (h.games?.length || 0), 0); let html = `<div class="topbar"><h1>VR-шлемы и игры</h1><div><span class="live-clock" id="liveClock"></span></div></div><div class="summary"><div class="summary-card"><div class="sc-val">${helmets.length}</div><div class="sc-label">VR-шлемов</div></div><div class="summary-card"><div class="sc-val" style="color:#58a6ff">${totalGames}</div><div class="sc-label">Всего игр</div></div></div><div class="vr-helmets-list">`;
             helmets.forEach(helmet => { const games = helmet.games || []; html += `<div class="vr-helmet-card"><div class="vr-helmet-header" onclick="toggleHelmetGames('${helmet.id}')"><div class="vr-helmet-title"><i class="fas fa-vr-cardboard"></i><span>${helmet.name}</span></div><div class="vr-helmet-stats">🎮 ${games.length} игр</div></div><div class="vr-games-list" id="games-${helmet.id}">`;
                 if (games.length === 0) html += `<div class="empty-games">📭 Нет игр</div>`;
-                else games.forEach(game => { html += `<div class="vr-game-item"><div class="vr-game-name"><i class="fas fa-gamepad"></i> ${escapeHtml(game.name)}${game.desc ? `<div style="font-size:10px;color:#8b949e;">${escapeHtml(game.desc)}</div>` : ''}</div><div class="vr-game-actions"><button class="btn btn-red btn-sm" onclick="removeGameFromHelmet('${helmet.id}', ${game.id})"><i class="fas fa-trash"></i></button></div></div>`; });
-                html += `<div class="add-game-form"><button class="btn btn-green btn-sm" onclick="openAddGameModal('${helmet.id}')"><i class="fas fa-plus"></i> Добавить игру</button></div></div></div>`;
+                else games.forEach(game => { html += `<div class="vr-game-item"><div class="vr-game-name"><i class="fas fa-gamepad"></i> ${escapeHtml(game.name)}${game.desc ? `<div style="font-size:10px;">${escapeHtml(game.desc)}</div>` : ''}</div><div class="vr-game-actions"><button class="btn btn-red btn-sm" onclick="removeGameFromHelmet('${helmet.id}', ${game.id})"><i class="fas fa-trash"></i></button></div></div>`; });
+                html += `<div class="add-game-form"><input type="text" id="newGameNameInput" placeholder="Название игры" style="flex:1;"><input type="text" id="newGameDescInput" placeholder="Описание" style="flex:1;"><button class="btn btn-green btn-sm" onclick="addGameToHelmetById('${helmet.id}')"><i class="fas fa-plus"></i> Добавить</button></div></div></div>`;
             }); html += `</div>`; document.getElementById('mainContent').innerHTML = html; }
         function toggleHelmetGames(helmetId) { const el = document.getElementById(`games-${helmetId}`); if (el) el.style.display = el.style.display === 'none' ? 'flex' : 'none'; }
-        function addGameToHelmetById(helmetId) { const nameInput = document.getElementById('newGameNameInput'); const descInput = document.getElementById('newGameDescInput'); const name = nameInput?.value.trim(); const desc = descInput?.value.trim() || ''; if (!name) return showToast('Введите название игры'); const helmet = findEquip(helmetId); if (helmet) { const newId = helmet.games.length ? Math.max(...helmet.games.map(g => g.id)) + 1 : 1; helmet.games.push({ id: newId, name: name, desc: desc }); saveData(); renderVRGames(); showToast(`✅ Игра "${name}" добавлена`); } }
+        function addGameToHelmetById(helmetId) { const nameInput = document.getElementById('newGameNameInput'); const descInput = document.getElementById('newGameDescInput'); const name = nameInput?.value.trim(); const desc = descInput?.value.trim() || ''; if (!name) return showToast('Введите название игры'); const helmet = findEquip(helmetId); if (helmet) { const newId = helmet.games.length ? Math.max(...helmet.games.map(g => g.id)) + 1 : 1; helmet.games.push({ id: newId, name: name, desc: desc }); saveData(); renderVRGames(); showToast(`✅ Игра "${name}" добавлена`); if (nameInput) nameInput.value = ''; if (descInput) descInput.value = ''; } }
 
-        // КАЛЕНДАРЬ
+        // ============ КАЛЕНДАРЬ ============
         let currentCalendarDate = new Date();
         function renderCalendarAndHistory() {
             const now = currentCalendarDate; const year = now.getFullYear(); const month = now.getMonth();
@@ -460,268 +466,7 @@
             for (let i = 0; i < startOffset; i++) html += `<div class="calendar-day empty"></div>`;
             const today = new Date().toISOString().slice(0,10);
             for (let day = 1; day <= daysInMonth; day++) { const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`; const dayShifts = shiftsByDay[dateKey] || []; const isToday = dateKey === today; html += `<div class="calendar-day ${isToday ? 'today' : ''} ${dayShifts.length ? 'has-shifts' : ''}" onclick="showDayShifts('${dateKey}')"><div class="calendar-day-number">${day}</div>${dayShifts.length ? `<div class="calendar-shift-count">📅 ${dayShifts.length} смен</div>` : ''}<div class="calendar-shift-list">${dayShifts.slice(0,2).map(s => `<span>${s.staffName}</span>`).join('')}${dayShifts.length > 2 ? `<span>+${dayShifts.length-2}</span>` : ''}</div></div>`; }
-            html += `</div><div class="dev-card"><h3>Смены за ${now.toLocaleString('ru', { month: 'long' })}</h3><div class="table-wrap"><table><thead><tr><th>Дата</th><th>Сотрудник</th><th>Начало</th><th>Конец</th><th>Часы</th><th>Сумма</th></tr></thead><tbody>`;
+            html += `</div><div class="dev-card"><h3>Смены за ${now.toLocaleString('ru', { month: 'long' })}</h3><div class="table-wrap"></table><thead><tr><th>Дата</th><th>Сотрудник</th><th>Начало</th><th>Конец</th><th>Часы</th><th>Сумма</th></tr></thead><tbody>`;
             const monthShifts = ShiftsHistory.filter(sh => { const d = new Date(sh.start); return d.getMonth() === month && d.getFullYear() === year; });
             if (monthShifts.length === 0) html += '<tr><td colspan="6">Нет смен</td>';
-            else [...monthShifts].reverse().forEach(sh => { const s = new Date(sh.start); const e = new Date(sh.end); const hours = Math.floor((e - s) / 3600000); html += `<tr><td>${s.toLocaleDateString()}</td><td><strong>${sh.staffName}</strong></td><td>${s.toLocaleTimeString()}</td><td>${e.toLocaleTimeString()}</td><td>${hours} ч</td><td>${sh.rate} ₽</td></tr>`; });
-            html += `</tbody></table></div></div>`;
-            document.getElementById('mainContent').innerHTML = html;
-        }
-        function changeMonth(delta) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta); renderCalendarAndHistory(); }
-        function showDayShifts(dateKey) { const dayShifts = ShiftsHistory.filter(sh => sh.start.startsWith(dateKey)); if (dayShifts.length === 0) { showToast('Нет смен'); return; } let msg = `📅 ${dateKey}\n`; dayShifts.forEach(sh => { const s = new Date(sh.start); const e = new Date(sh.end); msg += `\n${sh.staffName}: ${s.toLocaleTimeString()} - ${e.toLocaleTimeString()} | ${sh.rate} ₽`; }); alert(msg); }
-
-        // ПЕРЕМЕЩЕНИЯ
-        function openMoveModal() {
-            selectedEquipments.clear();
-            const container = document.getElementById('equipmentSelector');
-            const allEquip = getAllEquip();
-            container.innerHTML = '';
-            allEquip.forEach(eq => {
-                const isMoved = eq.moveId !== null;
-                const div = document.createElement('div');
-                div.className = 'equipment-item' + (isMoved ? ' disabled' : '');
-                div.innerHTML = `<input type="checkbox" value="${eq.id}" ${isMoved ? 'disabled' : ''} onchange="toggleEquipmentSelection('${eq.id}', this.checked)"><span>${eq.name} ${isMoved ? '(уже в перемещении)' : ''}</span>`;
-                container.appendChild(div);
-            });
-            openModal('modalMoveEquipment');
-        }
-        function toggleEquipmentSelection(equipId, isChecked) { if (isChecked) selectedEquipments.add(equipId); else selectedEquipments.delete(equipId); const countSpan = document.getElementById('selectedCount'); if (countSpan) countSpan.textContent = `Выбрано: ${selectedEquipments.size}`; }
-        function submitMultiMove() {
-            if (selectedEquipments.size === 0) { showToast('❌ Выберите оборудование'); return; }
-            const category = document.getElementById('selectMoveCategory').value;
-            const desc = document.getElementById('inputMoveDesc').value.trim();
-            const staffName = document.getElementById('inputMoveStaffName').value.trim();
-            const phone = document.getElementById('inputMovePhone').value.trim();
-            if (!desc) { showToast('❌ Добавьте описание'); return; }
-            const moveId = Moves.nextId++;
-            const equipmentsList = [];
-            selectedEquipments.forEach(equipId => {
-                const item = findEquip(equipId);
-                if (item && item.moveId === null) {
-                    equipmentsList.push(item.name);
-                    item.moveId = moveId;
-                }
-            });
-            if (equipmentsList.length === 0) { showToast('❌ Оборудование уже в перемещении'); return; }
-            Moves.list.push({ id: moveId, equipments: Array.from(selectedEquipments), equipmentsNames: equipmentsList, category, desc, staffName: staffName || 'Не указан', phone: phone || 'Не указан', createdAt: new Date().toISOString(), returned: false });
-            saveData(); closeModal('modalMoveEquipment'); renderMoves(); showToast(`✅ Перемещение создано для ${equipmentsList.length} ед.`);
-            document.getElementById('inputMoveDesc').value = ''; selectedEquipments.clear();
-        }
-        function renderMoves() { let html = `<div class="topbar"><h1>Перемещения</h1><button class="btn btn-blue" onclick="openMoveModal()"><i class="fas fa-plus"></i> Новое</button></div>`; if (Moves.list.length === 0) html += `<div class="empty-moves"><i class="fas fa-box-open"></i><p>Нет перемещений</p></div>`; else { html += `<div class="moves-grid">`; [...Moves.list].reverse().forEach(m => { html += `<div class="move-card"><div class="move-card-header"><span class="move-card-id">#${m.id}</span><span class="move-card-status ${m.returned ? 'returned' : ''}">${m.returned ? '✅ Возвращено' : '📦 В пути'}</span></div><div class="move-card-equipments">${(m.equipmentsNames || []).map(name => `<span>${escapeHtml(name)}</span>`).join('')}</div><div class="move-card-category">${m.category === 'park' ? 'Парк' : m.category === 'event' ? 'Мероприятие' : m.category === 'repair' ? 'Ремонт' : 'Сотрудник'}</div>${m.desc ? `<div class="move-card-desc">${escapeHtml(m.desc)}</div>` : ''}<div class="move-card-footer"><span><i class="fas fa-user"></i> ${m.staffName}</span>${!m.returned ? `<button class="btn btn-green btn-sm" onclick="returnMultiEquipment(${m.id})"><i class="fas fa-undo"></i> Вернуть всё</button>` : ''}</div></div>`; }); html += `</div>`; } document.getElementById('mainContent').innerHTML = html; }
-        function returnMultiEquipment(moveId) { const move = Moves.list.find(m => m.id === moveId); if (!move || move.returned) return; (move.equipments || []).forEach(equipId => { const item = findEquip(equipId); if (item && item.moveId === moveId) item.moveId = null; }); move.returned = true; saveData(); renderMoves(); showToast('🔄 Оборудование возвращено'); }
-
-        // ПРОБЛЕМЫ
-        function renderIssues() { let html = `<div class="topbar"><h1>Журнал проблем</h1><div><button class="btn btn-yellow btn-sm" onclick="exportToExcel('issues')"><i class="fas fa-file-excel"></i> Excel</button><button class="btn btn-red" onclick="openModal('modalReportIssue')"><i class="fas fa-plus"></i> Новая проблема</button></div></div>`; if (Issues.list.length === 0) html += `<div class="empty-issues"><i class="fas fa-check-circle"></i><p>✅ Проблем нет</p></div>`; else { html += `<div class="issues-grid">`; [...Issues.list].reverse().forEach(issue => { let statusClass = issue.status === 'done' ? 'status-done' : 'status-open'; let statusText = issue.status === 'done' ? '✅ Готово' : '🟡 Открыта'; let priorityClass = issue.priority === 'Высокая' ? 'priority-high-card' : (issue.priority === 'Средняя' ? 'priority-medium-card' : 'priority-low-card'); let priorityText = issue.priority === 'Высокая' ? '🔴 Высокая' : (issue.priority === 'Средняя' ? '🟡 Средняя' : '🟢 Низкая'); html += `<div class="issue-card"><div class="issue-card-header"><span class="issue-card-id">#${issue.id}</span><span class="issue-card-status ${statusClass}">${statusText}</span></div><div class="issue-card-equip"><i class="fas fa-microchip"></i> ${issue.equipName}</div><div class="issue-card-desc">📝 ${escapeHtml(issue.desc)}</div><div class="issue-card-footer"><span><i class="fas fa-calendar"></i> ${new Date(issue.date).toLocaleDateString()}</span><span class="issue-card-priority ${priorityClass}">${priorityText}</span></div>${issue.image ? `<img src="${issue.image}" class="issue-card-image" onclick="viewImage('${issue.image}')">` : ''}${issue.status !== 'done' ? `<div><button class="btn btn-green btn-sm" onclick="changeIssueStatus(${issue.id}, 'done')">✅ Закрыть</button></div>` : ''}</div>`; }); html += `</div>`; } document.getElementById('mainContent').innerHTML = html; }
-
-        // ЗАДАЧИ
-        function isTaskOverdue(task) { if (task.status !== 'pending') return false; if (!task.dateTo) return false; const today = new Date(); today.setHours(0,0,0,0); const dueDate = new Date(task.dateTo); dueDate.setHours(0,0,0,0); return dueDate < today; }
-        function addTask(title, desc, dateFrom, dateTo, assignee, priority) { const newId = Tasks.length ? Math.max(...Tasks.map(t => t.id)) + 1 : 1; Tasks.push({ id: newId, title, desc, dateFrom: dateFrom || '', dateTo: dateTo || '', assignee, priority, status: 'pending', rejectReason: '' }); saveData(); renderTasks(); showToast('✅ Задача создана'); }
-        function completeTask(id) { const task = Tasks.find(t => t.id === id); if (task && task.status === 'pending') { task.status = 'done'; saveData(); renderTasks(); showToast('✅ Задача выполнена'); } }
-        function rejectTask(id, reason) { const task = Tasks.find(t => t.id === id); if (task && task.status === 'pending') { task.status = 'rejected'; task.rejectReason = reason; saveData(); renderTasks(); showToast('❌ Задача отклонена'); } }
-        let currentRejectTaskId = null;
-        function openRejectModal(taskId) { currentRejectTaskId = taskId; openModal('modalRejectReason'); }
-        function submitReject() { const reason = document.getElementById('rejectReason').value.trim(); if (!reason) return alert('Укажите причину'); rejectTask(currentRejectTaskId, reason); closeModal('modalRejectReason'); document.getElementById('rejectReason').value = ''; }
-        function getAssigneeClass(assignee) { const map = { "Паша":"assignee-pasha","Таня":"assignee-tanya","Нура":"assignee-nura","Юра":"assignee-yura","Константин":"assignee-konstantin","Артём":"assignee-artem","Никита":"assignee-nikita","Даниил":"assignee-daniil" }; return map[assignee] || "assignee-daniil"; }
-        function renderTasks() { const pending = Tasks.filter(t => t.status === 'pending'); const done = Tasks.filter(t => t.status === 'done'); const overdue = Tasks.filter(t => isTaskOverdue(t)); let html = `<div class="topbar"><h1>Список задач</h1><div><button class="btn btn-yellow btn-sm" onclick="exportToExcel('tasks')"><i class="fas fa-file-excel"></i> Excel</button><button class="btn btn-purple" onclick="openModal('modalTask')"><i class="fas fa-plus"></i> Новая задача</button></div></div><div class="summary"><div class="summary-card"><div class="sc-val">${pending.length}</div><div class="sc-label">В работе</div></div><div class="summary-card"><div class="sc-val" style="color:#3fb950">${done.length}</div><div class="sc-label">Выполнено</div></div><div class="summary-card"><div class="sc-val" style="color:#f85149">${overdue.length}</div><div class="sc-label">Просрочено</div></div></div>`;
-            if (Tasks.length === 0) html += `<div class="shift-block inactive" style="text-align:center;">📭 Нет задач</div>`;
-            else { html += `<div class="task-grid">`; Tasks.forEach(task => { const doneClass = task.status === 'done' ? 'done' : ''; const overdueClass = isTaskOverdue(task) ? 'overdue' : ''; const assigneeClass = getAssigneeClass(task.assignee); const priorityClass = task.priority === 'high' ? 'priority-high' : (task.priority === 'medium' ? 'priority-medium' : 'priority-low'); const priorityText = task.priority === 'high' ? 'Высокая' : (task.priority === 'medium' ? 'Средняя' : 'Низкая'); let datesHtml = ''; if (task.dateFrom || task.dateTo) datesHtml = `<div class="task-dates">📅 ${task.dateFrom || '?'} → ${task.dateTo || '?'}</div>`; let overdueHtml = ''; if (isTaskOverdue(task)) overdueHtml = `<div class="task-overdue-warning">⚠️ ПРОСРОЧЕНО!</div>`; html += `<div class="task-card ${doneClass} ${overdueClass}"><div class="task-left"><input type="checkbox" class="task-checkbox" ${task.status === 'done' ? 'checked disabled' : ''} ${task.status === 'pending' ? `onclick="completeTask(${task.id})"` : ''}><div><div class="task-title">${escapeHtml(task.title)}</div><div class="task-desc">${escapeHtml(task.desc)}</div>${datesHtml}${overdueHtml}${task.rejectReason ? `<div class="task-reject-reason">❌ Причина: ${escapeHtml(task.rejectReason)}</div>` : ''}</div></div><div class="task-actions"><span class="task-assignee ${assigneeClass}">${task.assignee}</span><span class="task-priority ${priorityClass}">${priorityText}</span>${task.status === 'pending' ? `<button class="btn btn-red btn-sm" onclick="openRejectModal(${task.id})"><i class="fas fa-times"></i></button>` : ''}</div></div>`; }); html += `</div>`; } document.getElementById('mainContent').innerHTML = html; }
-
-        // СМЕНЫ
-        function startShift(name) { if (!name.trim()) return alert('Введите имя'); Shift.active = true; Shift.staffName = name.trim(); Shift.startTime = new Date().toISOString(); saveData(); renderShift(); showToast('🟢 Смена началась'); }
-        function endShift() { if (!Shift.active) return; const pay = calcPay(Shift.startTime); ShiftsHistory.push({ staffName: Shift.staffName, start: Shift.startTime, end: new Date().toISOString(), rate: pay }); Shift.active = false; Shift.startTime = null; saveData(); renderShift(); showToast(`🔴 Смена завершена. К выплате: ${pay} ₽`); }
-        function renderShift() { if (!Shift.active) { document.getElementById('mainContent').innerHTML = `<div class="topbar"><h1>Моя смена</h1></div><div class="shift-block inactive"><button class="btn btn-purple" onclick="openModal('modalShiftStart')">Начать смену</button></div>`; return; } const start = new Date(Shift.startTime); const diff = Math.floor((new Date() - start) / 60000); const pay = calcPay(Shift.startTime); document.getElementById('mainContent').innerHTML = `<div class="topbar"><h1>Моя смена</h1></div><div class="shift-block"><p><strong>${Shift.staffName}</strong></p><p>Начало: ${start.toLocaleTimeString()}</p><p>Прошло: ${Math.floor(diff/60)} ч ${diff%60} мин</p><p style="color:#3fb950;">К выплате: ${pay} ₽</p><button class="btn btn-red" onclick="endShift()">Завершить</button></div>`; }
-
-        // ДАШБОРД
-        function renderDashboard() { const stats = getStats(); const pay = Shift.active ? calcPay(Shift.startTime) : 0; const pendingTasks = Tasks.filter(t => t.status === 'pending').length; const overdueTasks = Tasks.filter(t => isTaskOverdue(t)).length; const totalGames = (Categories.helmets || []).reduce((s, h) => s + (h.games?.length || 0), 0); let html = `<div class="topbar"><h1>Мониторинг оборудования</h1><div><span class="live-clock" id="liveClock"></span>${Shift.active ? `<button class="btn btn-red" onclick="endShift()">Завершить (${pay}₽)</button>` : `<button class="btn btn-purple" onclick="openModal('modalShiftStart')">Начать смену</button>`}</div></div><div class="summary"><div class="summary-card"><div class="sc-val">${stats.ok}</div><div class="sc-label">Исправно</div></div><div class="summary-card"><div class="sc-val" style="color:#f85149">${stats.issue}</div><div class="sc-label">Неисправно</div></div><div class="summary-card"><div class="sc-val" style="color:#58a6ff">${stats.moved}</div><div class="sc-label">Перемещено</div></div><div class="summary-card"><div class="sc-val">${pendingTasks}</div><div class="sc-label">Активных задач</div></div><div class="summary-card"><div class="sc-val" style="color:#f85149">${overdueTasks}</div><div class="sc-label">Просрочено</div></div><div class="summary-card"><div class="sc-val" style="color:#58a6ff">${totalGames}</div><div class="sc-label">Всего игр</div></div><div class="summary-card"><div class="sc-val">${stats.total}</div><div class="sc-label">Всего единиц</div></div></div>`;
-            CATEGORY_DEFS.forEach(cat => { const items = Categories[cat.id] || []; if (items.length) { html += `<div class="section-title"><i class="fas ${cat.icon}"></i> ${cat.name}</div><div class="eq-grid">`; items.forEach(item => { const status = getEquipStatus(item); const statusText = getEquipStatusText(item); html += `<div class="eq-card ${status}"><i class="fas ${item.icon}"></i><div class="eq-name">${item.name}</div><div class="eq-status">${statusText}</div>${item.games?.length ? `<div style="font-size:9px;color:#58a6ff;">🎮 ${item.games.length} игр</div>` : ''}</div>`; }); html += `</div>`; } }); document.getElementById('mainContent').innerHTML = html; }
-        function renderHelmets() { let html = '<div class="topbar"><h1>Список оборудования</h1></div>'; CATEGORY_DEFS.forEach(cat => { const items = Categories[cat.id] || []; if (items.length) { html += `<div class="section-title"><i class="fas ${cat.icon}"></i> ${cat.name}</div><div class="eq-grid">`; items.forEach(item => { const status = getEquipStatus(item); const statusText = getEquipStatusText(item); html += `<div class="eq-card ${status}" onclick="openModal('modalMoveEquipment')"><i class="fas ${item.icon}"></i><div class="eq-name">${item.name}</div><div class="eq-status">${statusText}</div>${item.games?.length ? `<div style="font-size:9px;color:#58a6ff;">🎮 ${item.games.length} игр</div>` : ''}</div>`; }); html += `</div>`; } }); document.getElementById('mainContent').innerHTML = html; }
-
-        // ЭКСПОРТ
-        async function exportToExcel(type) { let data = []; let filename = ''; if (type === 'shifts') { data = ShiftsHistory.map(sh => ({ 'Сотрудник': sh.staffName, 'Дата начала': new Date(sh.start).toLocaleString(), 'Дата окончания': new Date(sh.end).toLocaleString(), 'Сумма': sh.rate })); filename = 'История_смен.xlsx'; } else if (type === 'tasks') { data = Tasks.map(t => ({ 'ID': t.id, 'Название': t.title, 'Описание': t.desc, 'Статус': t.status })); filename = 'Список_задач.xlsx'; } else if (type === 'issues') { data = Issues.list.map(i => ({ 'ID': i.id, 'Оборудование': i.equipName, 'Тип': i.type, 'Описание': i.desc, 'Статус': i.status, 'Дата': new Date(i.date).toLocaleString() })); filename = 'Журнал_проблем.xlsx'; } const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Отчет'); XLSX.writeFile(wb, filename); showToast('✅ Экспорт завершен'); }
-        async function exportToPDF(type) { const { jsPDF } = window.jspdf; const doc = new jsPDF(); let y = 20; doc.setFontSize(16); if (type === 'shifts') { doc.text('История смен', 14, y); y += 10; doc.setFontSize(10); ShiftsHistory.forEach((sh, idx) => { if (y > 270) { doc.addPage(); y = 20; } doc.text(`${idx+1}. ${sh.staffName} - ${new Date(sh.start).toLocaleDateString()} - ${sh.rate} ₽`, 14, y); y += 7; }); } else if (type === 'tasks') { doc.text('Список задач', 14, y); y += 10; doc.setFontSize(10); Tasks.forEach((t, idx) => { if (y > 270) { doc.addPage(); y = 20; } doc.text(`${idx+1}. ${t.title} - ${t.status}`, 14, y); y += 7; }); } else if (type === 'issues') { doc.text('Журнал проблем', 14, y); y += 10; doc.setFontSize(10); Issues.list.forEach((i, idx) => { if (y > 270) { doc.addPage(); y = 20; } doc.text(`${idx+1}. ${i.equipName} - ${i.type} - ${i.status}`, 14, y); y += 7; }); } doc.save(`отчет_${type}.pdf`); showToast('✅ PDF сохранен'); }
-
-        // ОБРАБОТЧИКИ
-        function handleImageUpload() { const file = document.getElementById('issueImage'); if (file && file.files[0]) { const reader = new FileReader(); reader.onload = e => { currentImageData = e.target.result; const preview = document.getElementById('imagePreview'); if (preview) preview.innerHTML = `<img src="${currentImageData}" class="image-preview">`; }; reader.readAsDataURL(file.files[0]); } }
-        function reportIssue(equipId, type, desc, priority) { if (!desc.trim()) return alert('Опишите проблему'); const item = findEquip(equipId); if (item && item.status !== 'issue') item.status = 'issue'; Issues.list.push({ id: Issues.nextId++, equipId, equipName: item?.name || equipId, type, desc, priority, status: 'open', date: new Date().toISOString(), who: currentUser?.name || 'Сотрудник', image: currentImageData || null }); currentImageData = null; const preview = document.getElementById('imagePreview'); if (preview) preview.innerHTML = ''; saveData(); renderIssues(); showToast('⚠ Проблема отправлена'); }
-        function viewImage(imageData) { if (imageData) { document.getElementById('fullImage').src = imageData; openModal('modalImageView'); } }
-        function changeIssueStatus(id, newStatus) { const issue = Issues.list.find(i => i.id === id); if (!issue) return; issue.status = newStatus; const item = findEquip(issue.equipId); if (newStatus === 'done' && item) item.status = 'ok'; saveData(); renderIssues(); }
-        function fillSelects() { const all = getAllEquip(); const issueSelect = document.getElementById('selectIssueEquipment'); if (issueSelect) { issueSelect.innerHTML = ''; all.forEach(e => { const opt = document.createElement('option'); opt.value = e.id; opt.textContent = e.name; issueSelect.appendChild(opt); }); } const moveSelect = document.getElementById('selectMoveEquipment'); if (moveSelect) { moveSelect.innerHTML = ''; all.forEach(e => { const opt = document.createElement('option'); opt.value = e.id; opt.textContent = e.name; moveSelect.appendChild(opt); }); } const taskAssignee = document.getElementById('taskAssignee'); if (taskAssignee) { taskAssignee.innerHTML = ''; const employees = ['Паша','Таня','Нура','Юра','Константин','Артём','Никита','Даниил']; employees.forEach(e => { const opt = document.createElement('option'); opt.value = e; opt.textContent = e; taskAssignee.appendChild(opt); }); } }
-
-        // ============ ПАНЕЛЬ УПРАВЛЯЮЩЕГО ============
-        let managerActiveTab = 'employees';
-        function renderManagerPanel() {
-            if (currentUser?.role !== 'director' && currentUser?.role !== 'manager') { document.getElementById('mainContent').innerHTML = '<div class="shift-block inactive" style="text-align:center;">⛔ Доступ запрещён</div>'; return; }
-            let html = `<div class="topbar"><h1><i class="fas fa-chalkboard-user"></i> Панель управляющего</h1><div><span class="live-clock" id="liveClock"></span></div></div>
-                <div class="manager-tabs"><button class="manager-tab-btn ${managerActiveTab === 'employees' ? 'active' : ''}" onclick="setManagerTab('employees')"><i class="fas fa-users"></i> Сотрудники</button>
-                <button class="manager-tab-btn ${managerActiveTab === 'salary' ? 'active' : ''}" onclick="setManagerTab('salary')"><i class="fas fa-coins"></i> Расчёт зарплаты</button>
-                <button class="manager-tab-btn ${managerActiveTab === 'settings' ? 'active' : ''}" onclick="setManagerTab('settings')"><i class="fas fa-sliders-h"></i> Настройки</button></div>
-                <div id="managerTabContent"></div>`;
-            document.getElementById('mainContent').innerHTML = html;
-            renderManagerTabContent();
-        }
-        function setManagerTab(tab) { managerActiveTab = tab; renderManagerPanel(); }
-        function renderManagerTabContent() {
-            const container = document.getElementById('managerTabContent'); if (!container) return;
-            if (managerActiveTab === 'employees') {
-                container.innerHTML = `<div class="dev-card"><h3>Управление сотрудниками</h3><button class="btn btn-green btn-sm" onclick="openModal('modalAddEmployee')"><i class="fas fa-plus"></i> Добавить сотрудника</button>
-                    <div class="table-wrap"><table class="users-table"><thead><tr><th>ID</th><th>Имя</th><th>Телефон</th><th>Telegram</th><th>Должность</th><th>Действия</th></tr></thead><tbody>
-                    ${Users.map(user => `<tr><td>${user.id}</td><td>${escapeHtml(user.name)}</td><td>${escapeHtml(user.phone || '—')}</td><td>${escapeHtml(user.tg || '—')}</td><td><span class="role-badge role-${user.role}">${getRoleName(user.role)}</span></td>
-                    <td><button class="btn btn-red btn-sm" onclick="deleteUser(${user.id})"><i class="fas fa-trash"></i></button> <button class="btn btn-yellow btn-sm" onclick="resetUserPassword(${user.id})"><i class="fas fa-key"></i></button></td></tr>`).join('')}
-                    </tbody></table></div></div>`;
-            } else if (managerActiveTab === 'salary') {
-                const currentDate = new Date(); const monthShifts = ShiftsHistory.filter(sh => new Date(sh.start).getMonth() === currentDate.getMonth());
-                const usersWithSalary = Users.map(user => { const userShifts = monthShifts.filter(sh => sh.staffName === user.name); const userTasks = Tasks.filter(t => t.assignee === user.name); const salary = calculateSalary(user.id, userShifts, userTasks); return { ...user, salary, shifts: userShifts.length, tasks: userTasks.filter(t => t.status === 'done').length, hours: userShifts.reduce((s, sh) => s + Math.floor((new Date(sh.end) - new Date(sh.start)) / 3600000), 0) }; });
-                const totalSalary = usersWithSalary.reduce((s, u) => s + u.salary, 0);
-                container.innerHTML = `<div class="dev-card"><h3>Расчёт зарплаты за ${currentDate.toLocaleString('ru', { month: 'long', year: 'numeric' })}</h3>
-                    <div class="salary-grid"><div class="salary-card"><h4>Общая статистика</h4><div class="salary-row"><span>Всего сотрудников:</span><span>${Users.length}</span></div>
-                    <div class="salary-row"><span>Всего часов:</span><span>${usersWithSalary.reduce((s, u) => s + u.hours, 0)} ч</span></div>
-                    <div class="salary-row"><span>Всего смен:</span><span>${monthShifts.length}</span></div>
-                    <div class="salary-total">Общий ФОТ: ${totalSalary.toLocaleString()} ₽</div></div>
-                    ${usersWithSalary.map(user => `<div class="salary-card"><h4><span class="role-badge role-${user.role}">${getRoleName(user.role)}</span> ${escapeHtml(user.name)}</h4>
-                    <div class="salary-row"><span>Отработано часов:</span><span>${user.hours} ч</span></div>
-                    <div class="salary-row"><span>Смен:</span><span>${user.shifts}</span></div>
-                    <div class="salary-row"><span>Выполнено задач:</span><span>${user.tasks}</span></div>
-                    <div class="salary-total">Итого: ${user.salary.toLocaleString()} ₽</div>
-                    <button class="btn btn-outline btn-sm" onclick="editUserSalary(${user.id})">Настроить компоненты</button></div>`).join('')}</div>
-                    <button class="btn btn-yellow btn-sm" onclick="exportSalaryToExcel()">Экспорт в Excel</button></div>`;
-            } else if (managerActiveTab === 'settings') {
-                container.innerHTML = `<div class="dev-card"><h3>Настройки зарплатных компонентов</h3><div class="salary-grid">
-                    ${SALARY_COMPONENTS.map(comp => `<div class="salary-card"><h4>${comp.name}</h4><div class="salary-row"><span>Тип:</span><span>${comp.type === 'fixed' ? 'Фиксированный' : comp.type === 'hourly' ? 'Почасовой' : comp.type === 'per_shift' ? 'За смену' : comp.type === 'per_task' ? 'За задачу' : comp.type === 'kpi' ? 'KPI' : comp.type === 'percent' ? 'Процент' : 'Дополнительный'}</span></div>
-                    <div class="salary-row"><span>Значение:</span><span>${comp.default} ${comp.unit}</span></div></div>`).join('')}
-                    </div><p style="color:#8b949e;">ℹ️ Для каждого сотрудника можно настроить индивидуальные значения</p></div>`;
-            }
-        }
-        function calculateSalary(userId, monthShifts, userTasks) {
-            const settings = UserSalarySettings[userId] || {};
-            const hoursWorked = monthShifts.reduce((s, sh) => s + Math.floor((new Date(sh.end) - new Date(sh.start)) / 3600000), 0);
-            const shiftCount = monthShifts.length;
-            const completedTasks = userTasks.filter(t => t.status === 'done').length;
-            let total = 0;
-            total += (settings.salaryBase || 50000);
-            total += (settings.hourlyRate || 100) * hoursWorked;
-            total += (settings.perShiftBonus || 50) * shiftCount;
-            total += (settings.perTaskBonus || 20) * completedTasks;
-            total += (settings.kpiBonus || 0);
-            total += (settings.regionCoefficient || 0);
-            total += (settings.seniorityBonus || 0);
-            total += (settings.nightShiftBonus || 0);
-            total += (settings.overtimeRate || 0) * Math.max(0, hoursWorked - 160);
-            total += (settings.projectBonus || 0);
-            return Math.round(total);
-        }
-        function editUserSalary(userId) {
-            const user = Users.find(u => u.id === userId);
-            const settings = UserSalarySettings[userId] || {};
-            let html = `<div class="modal"><h3>Настройка зарплаты: ${user.name}</h3>${SALARY_COMPONENTS.map(comp => `<div class="form-group"><label>${comp.name} (${comp.unit})</label><input type="number" id="comp_${comp.name.replace(/\s/g, '_')}" value="${settings[comp.name.replace(/\s/g, '_')] || comp.default}"></div>`).join('')}
-                <div class="btn-row"><button class="btn btn-outline" onclick="closeModal('modalEditSalary')">Отмена</button><button class="btn btn-purple" onclick="saveSalarySettings(${userId})">Сохранить</button></div></div>`;
-            const overlay = document.createElement('div'); overlay.id = 'modalEditSalary'; overlay.className = 'modal-overlay'; overlay.innerHTML = html; document.body.appendChild(overlay); openModal('modalEditSalary');
-        }
-        function saveSalarySettings(userId) {
-            const settings = {}; SALARY_COMPONENTS.forEach(comp => { const key = comp.name.replace(/\s/g, '_'); const input = document.getElementById(`comp_${key}`); if (input) settings[key] = parseFloat(input.value); });
-            UserSalarySettings[userId] = settings; saveData(); closeModal('modalEditSalary'); renderManagerPanel(); showToast('✅ Настройки сохранены');
-        }
-        function exportSalaryToExcel() {
-            const currentDate = new Date(); const monthShifts = ShiftsHistory.filter(sh => new Date(sh.start).getMonth() === currentDate.getMonth());
-            const data = Users.map(user => { const userShifts = monthShifts.filter(sh => sh.staffName === user.name); const userTasks = Tasks.filter(t => t.assignee === user.name); const salary = calculateSalary(user.id, userShifts, userTasks); const hours = userShifts.reduce((s, sh) => s + Math.floor((new Date(sh.end) - new Date(sh.start)) / 3600000), 0); return { 'Сотрудник': user.name, 'Должность': getRoleName(user.role), 'Отработано часов': hours, 'Смен': userShifts.length, 'Выполнено задач': userTasks.filter(t => t.status === 'done').length, 'Итого зарплата': salary }; });
-            const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, `Зарплата_${currentDate.toISOString().slice(0,10)}`); XLSX.writeFile(wb, `зарплата_${currentDate.toISOString().slice(0,10)}.xlsx`); showToast('✅ Экспорт завершен');
-        }
-        function addEmployee(name, phone, tg, role, password) { const newId = Users.length ? Math.max(...Users.map(u => u.id)) + 1 : 1; Users.push({ id: newId, name, phone, tg, role, password, tempPassword: true, createdAt: new Date().toISOString() }); saveData(); renderManagerPanel(); showToast(`✅ Сотрудник ${name} добавлен`); }
-        function deleteUser(userId) { if (currentUser?.id === userId) { showToast('❌ Нельзя удалить себя'); return; } Users = Users.filter(u => u.id !== userId); saveData(); renderManagerPanel(); showToast('✅ Сотрудник удалён'); }
-        function resetUserPassword(userId) { const user = Users.find(u => u.id === userId); if (user) { const newPass = prompt(`Новый пароль для ${user.name}:`, '1234'); if (newPass) { user.password = newPass; user.tempPassword = true; saveData(); showToast(`✅ Пароль изменён`); } } }
-
-        // ПРОФИЛЬ
-        function renderProfile() {
-            if (!currentUser) return;
-            let html = `<div class="topbar"><h1><i class="fas fa-user-circle"></i> Мой профиль</h1><div><span class="live-clock" id="liveClock"></span></div></div>
-                <div class="profile-card"><div class="profile-field"><label>Имя</label><input type="text" value="${escapeHtml(currentUser.name)}" readonly disabled></div>
-                <div class="profile-field"><label>Телефон</label><input type="text" value="${escapeHtml(currentUser.phone || '—')}" readonly disabled></div>
-                <div class="profile-field"><label>Telegram</label><input type="text" value="${escapeHtml(currentUser.tg || '—')}" readonly disabled></div>
-                <div class="profile-field"><label>Должность</label><input type="text" value="${getRoleName(currentUser.role)}" readonly disabled></div>
-                ${currentUser.tempPassword ? '<div class="profile-field" style="color:#d2991d;"><i class="fas fa-exclamation-triangle"></i> У вас временный пароль! Рекомендуем сменить.</div>' : ''}
-                <button class="btn btn-purple" onclick="openModal('modalChangePassword')"><i class="fas fa-key"></i> Сменить пароль</button></div>`;
-            document.getElementById('mainContent').innerHTML = html;
-        }
-        function changePassword(oldPass, newPass1, newPass2) {
-            if (oldPass !== currentUser.password) return showToast('❌ Неверный текущий пароль');
-            if (newPass1 !== newPass2) return showToast('❌ Пароли не совпадают');
-            if (newPass1.length < 4) return showToast('❌ Минимум 4 символа');
-            currentUser.password = newPass1; currentUser.tempPassword = false;
-            const userIndex = Users.findIndex(u => u.id === currentUser.id);
-            if (userIndex !== -1) { Users[userIndex].password = newPass1; Users[userIndex].tempPassword = false; }
-            saveData(); closeModal('modalChangePassword'); showToast('✅ Пароль изменён!');
-        }
-
-        // ============ НАВИГАЦИЯ ============
-        let pendingTab = null;
-        function checkPassword(tab, callback) { if (!PROTECTED_TABS.includes(tab)) { callback(true); return; } pendingTab = tab; window._pwdCallback = callback; openModal('modalPassword'); }
-        function submitPassword() { const input = document.getElementById('passwordInput').value; if (input === PASSWORD) { closeModal('modalPassword'); document.getElementById('passwordInput').value = ''; document.getElementById('passwordError').classList.add('hidden'); if (window._pwdCallback) window._pwdCallback(true); if (pendingTab) switchTab(pendingTab); pendingTab = null; } else { document.getElementById('passwordError').classList.remove('hidden'); } }
-        function switchTab(tab) { if (PROTECTED_TABS.includes(tab) && currentTab !== tab) { checkPassword(tab, (ok) => { if (ok) { currentTab = tab; render(); updateNav(); } }); return; } currentTab = tab; render(); updateNav(); }
-        function updateNav() { document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); const item = document.querySelector(`[data-tab="${currentTab}"]`); if (item) item.classList.add('active'); }
-        function updateBadge() { const cnt = Issues.list.filter(i => i.status !== 'done' && i.status !== 'cantfix').length; const badge = document.getElementById('badgeIssues'); if (badge) { badge.textContent = cnt; badge.style.display = cnt > 0 ? 'inline' : 'none'; } }
-        function updateClock() { const el = document.getElementById('liveClock'); if (el) el.textContent = new Date().toLocaleTimeString(); }
-        function render() { if (currentTab === 'dashboard') renderDashboard(); else if (currentTab === 'tasks') renderTasks(); else if (currentTab === 'vr_games') renderVRGames(); else if (currentTab === 'shift') renderShift(); else if (currentTab === 'calendar_history') renderCalendarAndHistory(); else if (currentTab === 'helmets') renderHelmets(); else if (currentTab === 'issues') renderIssues(); else if (currentTab === 'moves') renderMoves(); else if (currentTab === 'manager') renderManagerPanel(); else if (currentTab === 'profile') renderProfile(); updateBadge(); updateClock(); fillSelects(); }
-
-        // ============ МЕНЮ ============
-        function buildSidebar() {
-            let menuHtml = `<div class="logo"><i class="fas fa-vr-cardboard"></i><span>VR HOUSE</span></div>
-                <div class="nav-label">Основное</div>
-                <div class="nav-item" data-tab="dashboard"><i class="fas fa-th-large"></i> Мониторинг</div>
-                <div class="nav-item" data-tab="vr_games"><i class="fas fa-gamepad"></i> VR-игры</div>
-                <div class="nav-item" data-tab="tasks"><i class="fas fa-tasks"></i> Задачи</div>
-                <div class="nav-label">Сотрудник</div>
-                <div class="nav-item" data-tab="shift"><i class="fas fa-user-clock"></i> Моя смена <i class="fas fa-lock lock-icon"></i></div>
-                <div class="nav-item" data-tab="profile"><i class="fas fa-user-circle"></i> Мой профиль</div>
-                <div class="nav-label">Оборудование</div>
-                <div class="nav-item" data-tab="helmets"><i class="fas fa-clipboard-list"></i> Список</div>
-                <div class="nav-item" data-tab="moves"><i class="fas fa-truck"></i> Перемещения</div>
-                <div class="nav-item" data-tab="issues"><i class="fas fa-exclamation-triangle"></i> Проблемы <span class="nav-badge" id="badgeIssues">0</span></div>
-                <div class="nav-label">Система</div>
-                <div class="nav-item" data-tab="calendar_history"><i class="fas fa-calendar-alt"></i> Календарь смен <i class="fas fa-lock lock-icon"></i></div>`;
-            if (currentUser?.role === 'director' || currentUser?.role === 'manager') {
-                menuHtml += `<div class="nav-label">Управление</div>
-                <div class="nav-item" data-tab="manager"><i class="fas fa-chalkboard-user"></i> Панель управляющего</div>`;
-            }
-            document.getElementById('sidebar').innerHTML = menuHtml;
-            document.querySelectorAll('.nav-item').forEach(el => { el.addEventListener('click', () => { const tab = el.dataset.tab; if (tab) switchTab(tab); }); });
-        }
-
-        // ============ ИНИЦИАЛИЗАЦИЯ ============
-        function initModals() {
-            document.getElementById('btnSubmitTask')?.addEventListener('click', () => { const title = document.getElementById('taskTitle').value.trim(); if (!title) return alert('Введите название'); addTask(title, document.getElementById('taskDesc').value, document.getElementById('taskDateFrom').value, document.getElementById('taskDateTo').value, document.getElementById('taskAssignee').value, document.getElementById('taskPriority').value); closeModal('modalTask'); });
-            document.getElementById('btnCancelTask')?.addEventListener('click', () => closeModal('modalTask'));
-            document.getElementById('btnSubmitGame')?.addEventListener('click', addGameToHelmet);
-            document.getElementById('btnCancelGame')?.addEventListener('click', () => closeModal('modalAddGame'));
-            document.getElementById('btnSubmitReject')?.addEventListener('click', submitReject);
-            document.getElementById('btnCancelReject')?.addEventListener('click', () => closeModal('modalRejectReason'));
-            document.getElementById('btnStartShift')?.addEventListener('click', () => { startShift(document.getElementById('inputStaffName').value); closeModal('modalShiftStart'); });
-            document.getElementById('btnCancelShift')?.addEventListener('click', () => closeModal('modalShiftStart'));
-            document.getElementById('btnConfirmShiftEnd')?.addEventListener('click', () => { endShift(); closeModal('modalShiftEnd'); });
-            document.getElementById('btnCancelShiftEnd')?.addEventListener('click', () => closeModal('modalShiftEnd'));
-            document.getElementById('btnSubmitIssue')?.addEventListener('click', () => { const sel = document.getElementById('selectIssueEquipment'); if (sel) reportIssue(sel.value, document.getElementById('selectIssueType').value, document.getElementById('inputIssueDesc').value, document.getElementById('selectIssuePriority').value); closeModal('modalReportIssue'); document.getElementById('inputIssueDesc').value = ''; document.getElementById('issueImage').value = ''; });
-            document.getElementById('btnCancelIssue')?.addEventListener('click', () => closeModal('modalReportIssue'));
-            document.getElementById('btnSubmitMove')?.addEventListener('click', submitMultiMove);
-            document.getElementById('btnCancelMove')?.addEventListener('click', () => closeModal('modalMoveEquipment'));
-            document.getElementById('btnSubmitPassword')?.addEventListener('click', submitPassword);
-            document.getElementById('btnCancelPassword')?.addEventListener('click', () => closeModal('modalPassword'));
-            document.getElementById('btnCloseImage')?.addEventListener('click', () => closeModal('modalImageView'));
-            document.getElementById('issueImage')?.addEventListener('change', handleImageUpload);
-            document.getElementById('btnSubmitEmp')?.addEventListener('click', () => { const name = document.getElementById('empName').value.trim(); if (!name) return alert('Введите имя'); addEmployee(name, document.getElementById('empPhone').value, document.getElementById('empTg').value, document.getElementById('empRole').value, document.getElementById('empPassword').value); closeModal('modalAddEmployee'); });
-            document.getElementById('btnCancelEmp')?.addEventListener('click', () => closeModal('modalAddEmployee'));
-            document.getElementById('btnSubmitPass')?.addEventListener('click', () => { changePassword(document.getElementById('oldPass').value, document.getElementById('newPass1').value, document.getElementById('newPass2').value); closeModal('modalChangePassword'); });
-            document.getElementById('btnCancelPass')?.addEventListener('click', () => closeModal('modalChangePassword'));
-        }
-
-        function initApp() { loadData(); initModals(); switchTab('dashboard'); setInterval(() => { if (Shift.active && (currentTab === 'dashboard' || currentTab === 'shift')) render(); }, 60000); setInterval(updateClock, 1000); 
-            window.completeTask = completeTask; window.openRejectModal = openRejectModal; window.changeIssueStatus = changeIssueStatus; 
-            window.returnMultiEquipment = returnMultiEquipment; window.endShift = endShift; window.openModal = openModal; 
-            window.exportToExcel = exportToExcel; window.exportToPDF = exportToPDF; window.viewImage = viewImage; 
-            window.openAddGameModal = openAddGameModal; window.removeGameFromHelmet = removeGameFromHelmet; window.toggleHelmetGames = toggleHelmetGames; 
-            window.changeMonth = changeMonth; window.showDayShifts = showDayShifts; window.openMoveModal = openMoveModal; 
-            window.toggleEquipmentSelection = toggleEquipmentSelection; window.setManagerTab = setManagerTab; 
-            window.editUserSalary = editUserSalary; window.deleteUser = deleteUser; window.resetUserPassword = resetUserPassword; 
-            window.saveSalarySettings = saveSalarySettings; window.exportSalaryToExcel = exportSalaryToExcel; window.logout = () => { currentUser = null; location.reload(); };
-            window.addGameToHelmetById = addGameToHelmetById;
-        }
-    </script>
-</body>
-</html>
+            else [...monthShifts].reverse().forEach(sh => { const s = new Date(sh.start); const e = new Date(sh.end); const hours = Math.floor((e - s) / 3600000); html += `<tr>
