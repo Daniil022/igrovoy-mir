@@ -243,7 +243,7 @@
     <div class="modal-overlay hidden" id="modalChangePassword"><div class="modal"><h3>Смена пароля</h3><div class="form-group"><label>Текущий пароль</label><input type="password" id="oldPass"></div><div class="form-group"><label>Новый пароль</label><input type="password" id="newPass1"></div><div class="form-group"><label>Подтверждение</label><input type="password" id="newPass2"></div><div class="btn-row"><button class="btn btn-outline" id="btnCancelPass">Отмена</button><button class="btn btn-purple" id="btnSubmitPass">Сменить пароль</button></div></div></div>
 
     <script>
-        // ============ ЛИЦЕНЗИЯ И АВТОРИЗАЦИЯ ============
+        // ============ ЛИЦЕНЗИЯ ============
         const STORAGE_KEY = 'vrhouse_data_v20';
         const LICENSES = ['VRH-2025-ADMIN-001', 'VRH-DEMO-2025-001', 'VRH-TEST-2025-001'];
         let currentUser = null;
@@ -466,7 +466,6 @@
             for (let i = 0; i < startOffset; i++) html += `<div class="calendar-day empty"></div>`;
             const today = new Date().toISOString().slice(0,10);
             for (let day = 1; day <= daysInMonth; day++) { const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`; const dayShifts = shiftsByDay[dateKey] || []; const isToday = dateKey === today; html += `<div class="calendar-day ${isToday ? 'today' : ''} ${dayShifts.length ? 'has-shifts' : ''}" onclick="showDayShifts('${dateKey}')"><div class="calendar-day-number">${day}</div>${dayShifts.length ? `<div class="calendar-shift-count">📅 ${dayShifts.length} смен</div>` : ''}<div class="calendar-shift-list">${dayShifts.slice(0,2).map(s => `<span>${s.staffName}</span>`).join('')}${dayShifts.length > 2 ? `<span>+${dayShifts.length-2}</span>` : ''}</div></div>`; }
-            html += `</div><div class="dev-card"><h3>Смены за ${now.toLocaleString('ru', { month: 'long' })}</h3><div class="table-wrap"></table><thead><tr><th>Дата</th><th>Сотрудник</th><th>Начало</th><th>Конец</th><th>Часы</th><th>Сумма</th></tr></thead><tbody>`;
+            html += `</div><div class="dev-card"><h3>Смены за ${now.toLocaleString('ru', { month: 'long' })}</h3><div class="table-wrap"><table><thead><tr><th>Дата</th><th>Сотрудник</th><th>Начало</th><th>Конец</th><th>Часы</th><th>Сумма</th></tr></thead><tbody>`;
             const monthShifts = ShiftsHistory.filter(sh => { const d = new Date(sh.start); return d.getMonth() === month && d.getFullYear() === year; });
-            if (monthShifts.length === 0) html += '<tr><td colspan="6">Нет смен</td>';
-            else [...monthShifts].reverse().forEach(sh => { const s = new Date(sh.start); const e = new Date(sh.end); const hours = Math.floor((e - s) / 3600000); html += `<tr>
+            if (monthShifts.length === 0) html += '</table><td colspan="6">Нет смен</td>' + '
